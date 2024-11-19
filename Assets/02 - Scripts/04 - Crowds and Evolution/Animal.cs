@@ -43,6 +43,7 @@ public class Animal : MonoBehaviour
 
     // Renderer.
     private Material mat = null;
+    private bool isDestroyed = false;
 
     void Start()
     {
@@ -61,6 +62,8 @@ public class Animal : MonoBehaviour
 
     void Update()
     {
+        if (isDestroyed)
+            return;
         // In case something is not initialized...
         if (brain == null)
             brain = new SimpleNeuralNet(networkStruct);
@@ -182,6 +185,10 @@ public class Animal : MonoBehaviour
     public float GetHealth()
     {
         return energy / maxEnergy;
+    }
+    public void NoFurtherUpdates()
+    {
+        isDestroyed = true;
     }
 
 }
