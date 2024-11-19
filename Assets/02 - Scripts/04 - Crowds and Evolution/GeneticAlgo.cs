@@ -55,10 +55,10 @@ public class GeneticAlgo : MonoBehaviour
 
         // Update grass elements/food resources.
         // Only grow resources during the day
-        if (dayNightSystem.IsDaytime())
-        {
+        // if (dayNightSystem.IsDaytime())
+        // {
         updateResources();
-    }
+        // }
     }
 
     /// <summary>

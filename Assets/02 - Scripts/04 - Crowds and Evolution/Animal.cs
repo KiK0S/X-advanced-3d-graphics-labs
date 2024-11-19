@@ -20,12 +20,16 @@ public class Animal : MonoBehaviour
     public float maxEnergy = 10.0f;
     public float lossEnergy = 0.1f;
     public float gainEnergy = 10.0f;
+    public float spawnEnergyRequired = 7.0f;
     private float energy;
 
     [Header("Sensor - Vision")]
     public float maxVision = 20.0f;
     public float stepAngle = 10.0f;
     public int nEyes = 5;
+
+    [Header("Spawning")]
+    public float spawnChance = 0.001f;
 
     private int[] networkStruct;
     private SimpleNeuralNet brain = null;
@@ -49,9 +53,6 @@ public class Animal : MonoBehaviour
     private Material mat = null;
 
     private float speedCoeff = 0.0f;
-
-    public float timeToReproduce = 10.0f;
-    private float timerToReproduce = 0.0f;
 
     private bool isDestroyed = false;
 
@@ -95,7 +96,7 @@ public class Animal : MonoBehaviour
         energy -= lossEnergy;
 
         // If the animal is located in the dimensions of the terrain and over a grass position (details[dy, dx] > 0), it eats it, gain energy and spawn an offspring.
-        if ((dx >= 0) && dx < (details.GetLength(1)) && (dy >= 0) && (dy < details.GetLength(0)) && details[dy, dx] > 0 && speedCoeff < 0.02f)
+        if ((dx >= 0) && dx < (details.GetLength(1)) && (dy >= 0) && (dy < details.GetLength(0)) && details[dy, dx] > 0)
         {
             // Eat (remove) the grass and gain energy.
             details[dy, dx] = 0;
@@ -138,11 +139,9 @@ public class Animal : MonoBehaviour
         tfm.Rotate(0.0f, angle, 0.0f);
 
         speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;
-        // tfm.position += tfm.forward * speed;
+        tfm.position += tfm.forward;// * speedCoeff;
 
-        timerToReproduce += Time.deltaTime;
-        if (timerToReproduce > timeToReproduce) {
-            timerToReproduce = 0.0f;
+        if (energy >= spawnEnergyRequired && UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance) {
             genetic_algo.addOffspring(this);
         }
     }
