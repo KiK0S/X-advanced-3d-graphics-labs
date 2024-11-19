@@ -13,6 +13,7 @@ public class Animal : MonoBehaviour
     public float swapStrength = 10.0f;
     public float mutateStrength = 0.5f;
     public float maxAngle = 10.0f;
+    public float maxSpeed = 10.0f;
 
     [Header("Energy parameters")]
     public float maxEnergy = 10.0f;
@@ -43,13 +44,19 @@ public class Animal : MonoBehaviour
 
     // Renderer.
     private Material mat = null;
+
+    private float speedCoeff = 0.0f;
+
+    public float timeToReproduce = 10.0f;
+    private float timerToReproduce = 0.0f;
+
     private bool isDestroyed = false;
 
     void Start()
     {
         // Network: 1 input per receptor, 1 output per actuator.
         vision = new float[nEyes];
-        networkStruct = new int[] { nEyes, 5, 1 };
+        networkStruct = new int[] { nEyes, 5, 2 };
         energy = maxEnergy;
         tfm = transform;
 
@@ -83,15 +90,13 @@ public class Animal : MonoBehaviour
         energy -= lossEnergy;
 
         // If the animal is located in the dimensions of the terrain and over a grass position (details[dy, dx] > 0), it eats it, gain energy and spawn an offspring.
-        if ((dx >= 0) && dx < (details.GetLength(1)) && (dy >= 0) && (dy < details.GetLength(0)) && details[dy, dx] > 0)
+        if ((dx >= 0) && dx < (details.GetLength(1)) && (dy >= 0) && (dy < details.GetLength(0)) && details[dy, dx] > 0 && speedCoeff < 0.02f)
         {
             // Eat (remove) the grass and gain energy.
             details[dy, dx] = 0;
             energy += gainEnergy;
             if (energy > maxEnergy)
                 energy = maxEnergy;
-
-            genetic_algo.addOffspring(this);
         }
 
         // If the energy is below 0, the animal dies.
@@ -99,6 +104,7 @@ public class Animal : MonoBehaviour
         {
             energy = 0.0f;
             genetic_algo.removeAnimal(this);
+            return;
         }
 
         // Update the color of the animal as a function of the energy that it contains.
@@ -114,6 +120,15 @@ public class Animal : MonoBehaviour
         // 3. Act using actuators.
         float angle = (output[0] * 2.0f - 1.0f) * maxAngle;
         tfm.Rotate(0.0f, angle, 0.0f);
+
+        speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;
+        // tfm.position += tfm.forward * speed;
+
+        timerToReproduce += Time.deltaTime;
+        if (timerToReproduce > timeToReproduce) {
+            timerToReproduce = 0.0f;
+            genetic_algo.addOffspring(this);
+        }
     }
 
     /// <summary>
