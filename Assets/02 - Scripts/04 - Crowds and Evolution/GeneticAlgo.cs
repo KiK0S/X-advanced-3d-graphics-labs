@@ -21,6 +21,8 @@ public class GeneticAlgo : MonoBehaviour
     protected float width;
     protected float height;
 
+    private DayNightLighting dayNightSystem;
+
     void Start()
     {
         // Retrieve terrain.
@@ -28,6 +30,7 @@ public class GeneticAlgo : MonoBehaviour
         customTerrain = GetComponent<CustomTerrain>();
         width = terrain.terrainData.size.x;
         height = terrain.terrainData.size.z;
+        dayNightSystem = FindObjectOfType<DayNightLighting>();
 
         // Initialize terrain growth.
         currentGrowth = 0.0f;
@@ -48,10 +51,14 @@ public class GeneticAlgo : MonoBehaviour
         {
             animals.Add(makeAnimal());
         }
-        customTerrain.debug.text = "N° animals: " + animals.Count.ToString();
+        customTerrain.debug.text = "NÂ° animals: " + animals.Count.ToString() + "\nTime: " + (dayNightSystem.IsDaytime() ? "Day" : "Night");
 
         // Update grass elements/food resources.
+        // Only grow resources during the day
+        if (dayNightSystem.IsDaytime())
+        {
         updateResources();
+    }
     }
 
     /// <summary>
