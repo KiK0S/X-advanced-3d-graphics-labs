@@ -69,10 +69,20 @@ public class GeneticAlgo : MonoBehaviour
         Vector2 detail_sz = customTerrain.detailSize();
         int[,] details = customTerrain.getDetails();
         currentGrowth += vegetationGrowthRate;
-        while (currentGrowth > 1.0f)
+        int tolerance = 10;
+        while ((currentGrowth > 1.0f) && (tolerance > 0))
         {
             int x = (int)(UnityEngine.Random.value * detail_sz.x);
             int y = (int)(UnityEngine.Random.value * detail_sz.y);
+
+
+            float x_c = (float)x / detail_sz.x * customTerrain.gridSize().x;
+            float y_c = (float)y / detail_sz.y * customTerrain.gridSize().z;
+
+            if (customTerrain.get(x_c, y_c) < 1) {
+                tolerance--;
+                continue;
+            }
             details[y, x] = 1;
             currentGrowth -= 1.0f;
         }

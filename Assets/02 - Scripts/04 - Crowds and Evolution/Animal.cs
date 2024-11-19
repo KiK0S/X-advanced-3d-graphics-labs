@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,6 +39,8 @@ public class Animal : MonoBehaviour
     // Animal.
     private Transform tfm;
     private float[] vision;
+    private float[] geoInfo;
+    private float[] networkInput;
 
     // Genetic alg.
     private GeneticAlgo genetic_algo = null;
@@ -56,7 +59,9 @@ public class Animal : MonoBehaviour
     {
         // Network: 1 input per receptor, 1 output per actuator.
         vision = new float[nEyes];
-        networkStruct = new int[] { nEyes, 5, 2 };
+        geoInfo = new float[3];
+        networkInput = new float[nEyes + 3];
+        networkStruct = new int[] { nEyes + 3, 5, 2 };
         energy = maxEnergy;
         tfm = transform;
 
@@ -113,9 +118,20 @@ public class Animal : MonoBehaviour
 
         // 1. Update receptor.
         UpdateVision();
+        
+        UpdateGeo();
+
+        for (int i = 0; i < nEyes; ++i) {
+            networkInput[i] = vision[i];
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            networkInput[i + nEyes] = geoInfo[i];
+        }
+
 
         // 2. Use brain.
-        float[] output = brain.getOutput(vision);
+        float[] output = brain.getOutput(networkInput);
 
         // 3. Act using actuators.
         float angle = (output[0] * 2.0f - 1.0f) * maxAngle;
@@ -129,6 +145,12 @@ public class Animal : MonoBehaviour
             timerToReproduce = 0.0f;
             genetic_algo.addOffspring(this);
         }
+    }
+
+    private void UpdateGeo() {
+        geoInfo[0] = tfm.position.x;
+        geoInfo[1] = tfm.position.y;
+        geoInfo[2] = tfm.position.z;
     }
 
     /// <summary>
@@ -145,7 +167,8 @@ public class Animal : MonoBehaviour
             Vector3 forwardAnimal = rotAnimal * Vector3.forward;
             float sx = tfm.position.x * ratio.x;
             float sy = tfm.position.z * ratio.y;
-            vision[i] = 1.0f;
+            vision[i] = 0.0f;
+            Debug.DrawRay(tfm.position, forwardAnimal * maxVision, Color.red);
 
             // Interate over vision length.
             for (float distance = 1.0f; distance < maxVision; distance += 0.5f)
@@ -165,7 +188,7 @@ public class Animal : MonoBehaviour
 
                 if ((int)px >= 0 && (int)px < details.GetLength(1) && (int)py >= 0 && (int)py < details.GetLength(0) && details[(int)py, (int)px] > 0)
                 {
-                    vision[i] = distance / maxVision;
+                    vision[i] = 1 / distance;
                     break;
                 }
             }
