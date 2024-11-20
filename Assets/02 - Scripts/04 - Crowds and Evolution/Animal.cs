@@ -110,6 +110,9 @@ public class Animal : MonoBehaviour
             energy += gainEnergy;
             if (energy > maxEnergy)
                 energy = maxEnergy;
+
+            if (shouldSpawn())
+                spawnOffspring();
         }
 
         // If the energy is below 0, the animal dies.
@@ -139,11 +142,7 @@ public class Animal : MonoBehaviour
         float angle = (output[0] * 2.0f - 1.0f) * maxAngle;
         tfm.Rotate(0.0f, angle, 0.0f);
 
-        speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;
-
-        if (shouldSpawn()) {
-            spawnOffspring();
-        }
+        speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;        
     }
 
     private void UpdateGeo() {
