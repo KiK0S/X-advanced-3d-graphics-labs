@@ -168,6 +168,12 @@ public class Animal : MonoBehaviour
                UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance * timeOfLife;
     }
 
+    private void spawnOffspring() {
+        if (genetic_algo.addOffspring(this)) {
+            energy -= spawnEnergyRequired * 2.0f / 3.0f;
+        }
+    }
+
     /// <summary>
     /// Calculate distance to the nearest food resource, if there is any.
     /// </summary>
