@@ -13,7 +13,7 @@ public class GeneticAlgo : MonoBehaviour
     public GameObject animalPrefab;
 
     [Header("Dynamic elements")]
-    public float vegetationGrowthRate = 1.0f;
+    public float vegetationGrowthRate = 2.0f;
     public float currentGrowth;
 
     private List<GameObject> animals;
@@ -93,12 +93,13 @@ public class GeneticAlgo : MonoBehaviour
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
-    public GameObject makeAnimal(Vector3 position)
+    public GameObject makeAnimal(Vector3 position, int generation = 0)
     {
         GameObject animal = Instantiate(animalPrefab, transform);
         animal.GetComponent<Animal>().Setup(customTerrain, this);
         animal.transform.position = position;
         animal.transform.Rotate(0.0f, UnityEngine.Random.value * 360.0f, 0.0f);
+        animal.GetComponent<Animal>().generation = generation;
         return animal;
     }
 
@@ -124,7 +125,7 @@ public class GeneticAlgo : MonoBehaviour
         if (animals.Count >= maxAnimals) {
             return false;
         }
-        GameObject animal = makeAnimal(parent.transform.position);
+        GameObject animal = makeAnimal(parent.transform.position, parent.generation + 1);
         animal.GetComponent<Animal>().InheritBrain(parent.GetBrain(), true);
         animals.Add(animal);
         return true;

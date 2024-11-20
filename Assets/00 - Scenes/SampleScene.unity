@@ -655,7 +655,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 10, z: 8, w: -12}
+  m_BoundingSphereOverride: {x: 4.5872e-41, y: 3.4970323e-28, z: 4.5872e-41, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -908,13 +908,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 374040426}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58addec6626ef40dfb932e8efbbb6236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   popSize: 100
-  maxAnimals: 1000
+  maxAnimals: 10
   animalPrefab: {fileID: 6526620}
   vegetationGrowthRate: 1
   currentGrowth: 0
@@ -1234,7 +1234,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 609556146}
-  m_LocalRotation: {x: 0.07881489, y: 0.4802064, z: -0.04337664, w: 0.8725299}
+  m_LocalRotation: {x: 0.07881476, y: 0.48020643, z: -0.043376565, w: 0.87253}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1634,7 +1634,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1090240002}
   m_LocalRotation: {x: 0.078814894, y: 0.48020637, z: -0.043376632, w: 0.87253}
-  m_LocalPosition: {x: 5.7758684, y: 2.5, z: 7.3247967}
+  m_LocalPosition: {x: 5.7758684, y: 53.9, z: 7.3247967}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1920,7 +1920,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533686960}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.7758684, y: 2.5, z: 7.3247967}
+  m_LocalPosition: {x: 5.7758684, y: 53.9, z: 7.3247967}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1999,7 +1999,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1540813086}
-  m_LocalRotation: {x: 0.062972955, y: 0.4809143, z: -0.034657855, w: 0.8738162}
+  m_LocalRotation: {x: 0.06297282, y: 0.4809143, z: -0.034657784, w: 0.8738162}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2032,7 +2032,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1688669855}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 0, z: 10}
+  m_LocalPosition: {x: 10, y: 51.4, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2177,7 +2177,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2027396608}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a824ca224cc7eed44b6b3f680d77ee9f, type: 3}
   m_Name: 
@@ -2434,7 +2434,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2137751596}
-  m_LocalRotation: {x: 0.09467272, y: 0.47933796, z: -0.052104168, w: 0.870952}
+  m_LocalRotation: {x: 0.0946726, y: 0.47933796, z: -0.052104104, w: 0.870952}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2573,21 +2573,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
-        type: 3}
-      propertyPath: nEyes
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
-        type: 3}
-      propertyPath: maxVision
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
-        type: 3}
-      propertyPath: stepAngle
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}

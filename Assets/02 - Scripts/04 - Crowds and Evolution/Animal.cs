@@ -13,15 +13,18 @@ public class Animal : MonoBehaviour
     public float mutateRate = 0.01f;
     public float swapStrength = 10.0f;
     public float mutateStrength = 0.5f;
+    public float mutateDecay = 0.9f;
     public float maxAngle = 10.0f;
     public float maxSpeed = 10.0f;
+    [HideInInspector]
+    public int generation = 0;
 
     [Header("Energy parameters")]
-    public float maxEnergy = 10.0f;
+    public float maxEnergy = 50.0f;
     public float lossEnergy = 0.1f;
-    public float gainEnergy = 10.0f;
-    public float spawnEnergyRequired = 7.0f;
-    private float energy;
+    public float gainEnergy = 20.0f;
+    public float spawnEnergyRequired = 3.0f;
+    public float energy;
 
     [Header("Sensor - Vision")]
     public float maxVision = 20.0f;
@@ -29,7 +32,7 @@ public class Animal : MonoBehaviour
     public int nEyes = 5;
 
     [Header("Spawning")]
-    public float spawnChance = 0.0001f;
+    public float spawnChance = 0.1f;
 
     private int[] networkStruct;
     private SimpleNeuralNet brain = null;
@@ -142,7 +145,6 @@ public class Animal : MonoBehaviour
         float angle = (output[0] * 2.0f - 1.0f) * maxAngle;
         tfm.Rotate(0.0f, angle, 0.0f);
 
-        speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;        
     }
 
     private void UpdateGeo() {
@@ -163,7 +165,7 @@ public class Animal : MonoBehaviour
 
     private bool shouldSpawn() {
         return energy >= spawnEnergyRequired &&
-               UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance * timeOfLife;
+               UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance * (1.0f + timeOfLife);
     }
 
     private void spawnOffspring() {
@@ -233,7 +235,7 @@ public class Animal : MonoBehaviour
     {
         brain = new SimpleNeuralNet(other);
         if (mutate)
-            brain.mutate(swapRate, mutateRate, swapStrength, mutateStrength);
+            brain.mutate(swapRate, mutateRate, swapStrength, mutateStrength * Mathf.Pow(mutateDecay, generation));
     }
     public SimpleNeuralNet GetBrain()
     {
@@ -254,7 +256,7 @@ public class Animal : MonoBehaviour
                 inputSize += input.Length;
             }
             networkInput = new float[inputSize];
-            networkStruct = new int[] { inputSize, 5, 2 };
+            networkStruct = new int[] { inputSize, 3, 1 };
         }
         int index = 0;
         foreach (float[] input in inputs) {
