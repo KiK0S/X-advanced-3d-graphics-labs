@@ -140,7 +140,6 @@ public class Animal : MonoBehaviour
         tfm.Rotate(0.0f, angle, 0.0f);
 
         speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;
-        tfm.position += tfm.forward;// * speedCoeff;
 
         if (shouldSpawn()) {
             spawnOffspring();
