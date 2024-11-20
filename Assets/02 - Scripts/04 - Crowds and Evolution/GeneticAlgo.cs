@@ -82,7 +82,13 @@ public class GeneticAlgo : MonoBehaviour
             if (customTerrain.get(x_c, y_c) < 1) {
                 continue;
             }
-            details[y, x] = 1;
+            for (int j = -5; j <= 5; j++) {
+                for (int i = -5; i <= 5; i++) {
+                    if (y+j >= 0 && y+j < details.GetLength(0) && x+i >= 0 && x+i < details.GetLength(1)) {
+                        details[y+j, x+i] = 1;
+                    }
+                }
+            }
             currentGrowth -= 1.0f;
         }
         customTerrain.saveDetails();
