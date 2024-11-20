@@ -42,12 +42,15 @@ public class Animal : MonoBehaviour
 
     // Animal.
     private Transform tfm;
-    private float[] vision;
+    private float[] visionInfo;
     private float[] geoInfo;
+    private float[] dayInfo;
     private float[] networkInput;
 
     // Genetic alg.
     private GeneticAlgo genetic_algo = null;
+
+    private DayNightLighting dayNightSystem;
 
     // Renderer.
     private Material mat = null;
@@ -59,12 +62,15 @@ public class Animal : MonoBehaviour
     void Start()
     {
         // Network: 1 input per receptor, 1 output per actuator.
-        vision = new float[nEyes];
+        visionInfo = new float[nEyes];
         geoInfo = new float[3];
-        networkInput = new float[nEyes + 3];
-        networkStruct = new int[] { nEyes + 3, 5, 2 };
+        dayInfo = new float[2];
+
+        MakeNetworkInput(visionInfo, geoInfo, dayInfo);
+
         energy = maxEnergy;
         tfm = transform;
+        dayNightSystem = FindObjectOfType<DayNightLighting>();
 
         // Renderer used to update animal color.
         // It needs to be updated for more complex models.
@@ -122,13 +128,7 @@ public class Animal : MonoBehaviour
         
         UpdateGeo();
 
-        for (int i = 0; i < nEyes; ++i) {
-            networkInput[i] = vision[i];
-        }
-
-        for (int i = 0; i < 3; ++i) {
-            networkInput[i + nEyes] = geoInfo[i];
-        }
+        MakeNetworkInput(visionInfo, geoInfo, dayInfo);
 
 
         // 2. Use brain.
@@ -152,6 +152,17 @@ public class Animal : MonoBehaviour
         geoInfo[2] = tfm.position.z;
     }
 
+    private void UpdateDay() {
+        if (dayNightSystem.IsDaytime()) {
+            dayInfo[0] = dayNightSystem.GetDayNightCycle();
+            dayInfo[1] = -Mathf.Min(dayNightSystem.GetDayNightCycle(), 1 - dayNightSystem.GetDayNightCycle());
+        } else {
+            dayInfo[0] = -Mathf.Min(dayNightSystem.GetDayNightCycle(), 1 - dayNightSystem.GetDayNightCycle());
+            dayInfo[1] = dayNightSystem.GetDayNightCycle();
+        }
+    }
+
+
     /// <summary>
     /// Calculate distance to the nearest food resource, if there is any.
     /// </summary>
@@ -166,7 +177,7 @@ public class Animal : MonoBehaviour
             Vector3 forwardAnimal = rotAnimal * Vector3.forward;
             float sx = tfm.position.x * ratio.x;
             float sy = tfm.position.z * ratio.y;
-            vision[i] = 0.0f;
+            visionInfo[i] = 0.0f;
             Debug.DrawRay(tfm.position, forwardAnimal * maxVision, Color.red);
 
             // Interate over vision length.
@@ -187,7 +198,7 @@ public class Animal : MonoBehaviour
 
                 if ((int)px >= 0 && (int)px < details.GetLength(1) && (int)py >= 0 && (int)py < details.GetLength(0) && details[(int)py, (int)px] > 0)
                 {
-                    vision[i] = 1 / distance;
+                    visionInfo[i] = 1 / distance;
                     break;
                 }
             }
@@ -227,5 +238,21 @@ public class Animal : MonoBehaviour
     {
         isDestroyed = true;
     }
-
+    private void MakeNetworkInput(params float[][] inputs) {
+        if (networkInput == null) {
+            int inputSize = 0;
+            foreach (float[] input in inputs) {
+                inputSize += input.Length;
+            }
+            networkInput = new float[inputSize];
+            networkStruct = new int[] { inputSize, 5, 2 };
+        }
+        int index = 0;
+        foreach (float[] input in inputs) {
+            foreach (float value in input) {
+                networkInput[index] = value;
+                index++;
+            }
+        }
+    }
 }
