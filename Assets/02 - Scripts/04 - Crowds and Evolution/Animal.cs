@@ -29,7 +29,7 @@ public class Animal : MonoBehaviour
     public int nEyes = 5;
 
     [Header("Spawning")]
-    public float spawnChance = 0.001f;
+    public float spawnChance = 0.0001f;
 
     private int[] networkStruct;
     private SimpleNeuralNet brain = null;
@@ -57,6 +57,7 @@ public class Animal : MonoBehaviour
 
     private float speedCoeff = 0.0f;
 
+    private float timeOfLife = 0.0f;
     private bool isDestroyed = false;
 
     void Start()
@@ -100,7 +101,7 @@ public class Animal : MonoBehaviour
 
         // For each frame, we lose lossEnergy
         energy -= lossEnergy;
-
+        timeOfLife += Time.deltaTime;
         // If the animal is located in the dimensions of the terrain and over a grass position (details[dy, dx] > 0), it eats it, gain energy and spawn an offspring.
         if ((dx >= 0) && dx < (details.GetLength(1)) && (dy >= 0) && (dy < details.GetLength(0)) && details[dy, dx] > 0)
         {
@@ -141,7 +142,8 @@ public class Animal : MonoBehaviour
         speedCoeff = (output[1] * 2.0f - 1.0f) * maxSpeed;
         tfm.position += tfm.forward;// * speedCoeff;
 
-        if (energy >= spawnEnergyRequired && UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance) {
+        if (shouldSpawn()) {
+            energy -= spawnEnergyRequired * 2.0f / 3.0f;
             genetic_algo.addOffspring(this);
         }
     }
@@ -162,6 +164,10 @@ public class Animal : MonoBehaviour
         }
     }
 
+    private bool shouldSpawn() {
+        return energy >= spawnEnergyRequired &&
+               UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance * timeOfLife;
+    }
 
     /// <summary>
     /// Calculate distance to the nearest food resource, if there is any.
