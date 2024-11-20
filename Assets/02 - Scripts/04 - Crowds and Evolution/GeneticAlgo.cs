@@ -146,4 +146,7 @@ public class GeneticAlgo : MonoBehaviour
         Destroy(animal.transform.gameObject);
     }
 
+    public int getAnimalNum() {
+        return animals.Count;
+    }
 }
