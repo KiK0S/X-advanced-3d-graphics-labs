@@ -143,8 +143,7 @@ public class Animal : MonoBehaviour
         tfm.position += tfm.forward;// * speedCoeff;
 
         if (shouldSpawn()) {
-            energy -= spawnEnergyRequired * 2.0f / 3.0f;
-            genetic_algo.addOffspring(this);
+            spawnOffspring();
         }
     }
 

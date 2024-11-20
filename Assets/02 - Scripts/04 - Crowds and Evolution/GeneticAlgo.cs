@@ -9,6 +9,7 @@ public class GeneticAlgo : MonoBehaviour
 
     [Header("Genetic Algorithm parameters")]
     public int popSize = 100;
+    public int maxAnimals = 1000;
     public GameObject animalPrefab;
 
     [Header("Dynamic elements")]
@@ -120,11 +121,15 @@ public class GeneticAlgo : MonoBehaviour
     /// Method to add an animal inherited from anothed. It spawns where the parent was.
     /// </summary>
     /// <param name="parent"></param>
-    public void addOffspring(Animal parent)
+    public bool addOffspring(Animal parent)
     {
+        if (animals.Count >= maxAnimals) {
+            return false;
+        }
         GameObject animal = makeAnimal(parent.transform.position);
         animal.GetComponent<Animal>().InheritBrain(parent.GetBrain(), true);
         animals.Add(animal);
+        return true;
     }
 
     /// <summary>
