@@ -200,6 +200,21 @@ public class CustomTerrain : MonoBehaviour {
                            obj.position.z * heightmap_height);
     }
 
+    public TreeInstance[] getTreeInstances() {
+        return terrain_data.treeInstances;
+    }
+
+    public Vector3 getTreePosition(TreeInstance tree) {
+        return Vector3.Scale(tree.position, terrain_data.size);
+    }
+
+    public void removeTreeInstance(int index) {
+        TreeInstance[] trees = terrain_data.treeInstances;
+        List<TreeInstance> treesList = new List<TreeInstance>(trees);
+        treesList.RemoveAt(index);
+        terrain_data.treeInstances = treesList.ToArray();
+    }
+
     // Get dimensions of the heightmap grid
     public Vector3 gridSize() {
         return new Vector3(heightmap_width, 0.0f, heightmap_height);
@@ -276,5 +291,38 @@ public class CustomTerrain : MonoBehaviour {
     }
     public Brush getBrush() {
         return current_brush;
+    }
+
+    public GameObject InstantiateGenericObject(Vector3 position, float scale, GameObject prefab) {
+        Vector3 worldPos = grid2world(position);
+        GameObject obj = Instantiate(prefab, worldPos, Quaternion.Euler(0, UnityEngine.Random.Range(0f, 360f), 0));
+        obj.transform.localScale = Vector3.one * scale;
+        obj.transform.parent = transform;
+        return obj;
+    }
+
+    public void RemoveObjectAtPosition(Vector3 position, float radius, bool removeTrees) {
+        if (removeTrees) {
+            // Remove tree instances within radius
+            TreeInstance[] trees = terrain_data.treeInstances;
+            List<TreeInstance> remainingTrees = new List<TreeInstance>();
+            
+            for (int i = 0; i < trees.Length; i++) {
+                Vector3 treePos = getTreePosition(trees[i]);
+                if (Vector3.Distance(position, treePos) > radius) {
+                    remainingTrees.Add(trees[i]);
+                }
+            }
+            
+            terrain_data.treeInstances = remainingTrees.ToArray();
+        } else {
+            // Remove regular GameObjects within radius
+            Collider[] colliders = Physics.OverlapSphere(position, radius);
+            foreach (Collider col in colliders) {
+                if (col.transform.parent == transform) {
+                    Destroy(col.gameObject);
+                }
+            }
+        }
     }
 }

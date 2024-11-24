@@ -19,7 +19,7 @@ public enum KernelType {
 
 public class SquareKernel : BrushKernel {
     public override bool included(int dx, int dz, int radius) {
-        return dx <= radius && dz <= radius;
+        return Mathf.Abs(dx) <= radius && Mathf.Abs(dz) <= radius;
     }
 }
 
