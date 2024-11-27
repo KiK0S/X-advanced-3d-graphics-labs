@@ -655,8 +655,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 2.4810396e+27, y: 7.1518455e+22, z: 1.6634185e+22,
-    w: 1.6632139e+22}
+  m_BoundingSphereOverride: {x: 1.815e-42, y: 1.05e-43, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -793,7 +792,6 @@ GameObject:
   - component: {fileID: 374040428}
   - component: {fileID: 374040427}
   - component: {fileID: 374040430}
-  - component: {fileID: 374040435}
   - component: {fileID: 374040440}
   - component: {fileID: 374040444}
   - component: {fileID: 374040443}
@@ -804,6 +802,9 @@ GameObject:
   - component: {fileID: 374040445}
   - component: {fileID: 374040448}
   - component: {fileID: 374040447}
+  - component: {fileID: 374040435}
+  - component: {fileID: 374040452}
+  - component: {fileID: 374040451}
   - component: {fileID: 374040450}
   m_Layer: 0
   m_Name: Terrain
@@ -902,6 +903,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a784b2bfbd9436ababbfa7c8e8805a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useTreeSystem: 1
+  prefabDistributions: []
 --- !u!114 &374040440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,8 +920,6 @@ MonoBehaviour:
   popSize: 100
   maxAnimals: 500
   animalPrefab: {fileID: 6526620}
-  vegetationGrowthRate: 3
-  currentGrowth: 0
 --- !u!114 &374040441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1063,9 +1064,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 374040426}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fa863e5f6d550736ab0e6386c0529e2, type: 3}
+  m_Script: {fileID: 11500000, guid: 998a32df90b09fb6da7cfb727b145410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useTreeSystem: 1
+  prefabDistributions: []
+  kernelType: 0
+--- !u!114 &374040451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 190ae9078a36dfdf59a00a537dc9d994, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useTreeSystem: 1
+  prefabDistributions: []
+  n_max_entities: 10
+  heightThreshold: 15
+  kernelType: 0
+--- !u!114 &374040452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d57228cc64df47adfb4b1bfeab6ff6a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useTreeSystem: 1
+  prefabDistributions: []
+  n_max_entities: 10
+  steepnessThreshold: 1
+  kernelType: 0
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -2323,6 +2361,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1610005562}
   m_CullTransparentMesh: 1
+--- !u!1 &1614883766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1614883768}
+  - component: {fileID: 1614883767}
+  m_Layer: 0
+  m_Name: GrassSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1614883767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614883766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637910a5589889d86b0972da1576e86a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vegetationGrowthRate: 10
+  lowGrassThreshold: 30
+  highGrassThreshold: 65
+--- !u!4 &1614883768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614883766}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 255.5322, y: 421.13486, z: 267.15424}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 20
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1688669855
 GameObject:
   m_ObjectHideFlags: 0
@@ -2502,9 +2587,9 @@ MonoBehaviour:
   dayIntensity: 1
   nightColor: {r: 0.5, g: 0.5, b: 0.8, a: 1}
   nightIntensity: 0.5
-  deltaTime: 0.05
+  deltaTime: 0.01
   nightDuration: 10
-  dayDuration: 10
+  dayDuration: 40
   daySkybox: {fileID: 2100000, guid: 9991b6265f7f87d43b7e3c676739f203, type: 2}
   nightSkybox: {fileID: 2100000, guid: e523c896238589445ae28370258d26c6, type: 2}
 --- !u!4 &2027396610
@@ -2897,12 +2982,12 @@ PrefabInstance:
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: maxEnergy
-      value: 50
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: gainEnergy
-      value: 20
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
@@ -2913,6 +2998,11 @@ PrefabInstance:
         type: 3}
       propertyPath: spawnChance
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
+      propertyPath: mutateStrength
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}

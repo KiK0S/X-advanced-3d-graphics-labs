@@ -36,6 +36,20 @@ public class SimpleNeuralNet
         }
     }
 
+    private float initWeight()
+    {
+        // Box-Muller transform to generate normal distribution
+        float u1 = UnityEngine.Random.value;
+        float u2 = UnityEngine.Random.value;
+        
+        // Using standard normal distribution (mean = 0, std = 1)
+        float randStdNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
+        
+        // Scale the weights - using Xavier initialization
+        // The 0.1f factor helps prevent initial saturation of neurons
+        return randStdNormal * 0.1f;
+    }
+
     private float[,] makeLayer(int input, int numberNodes)
     {
 
@@ -45,7 +59,7 @@ public class SimpleNeuralNet
         {
             for (int j = 0; j < weights.GetLength(1); j++)
             {
-                weights[i, j] = (2.0f * UnityEngine.Random.value - 1.0f) * 10.0f;
+                weights[i, j] = initWeight();
             }
         }
         return weights;
@@ -82,7 +96,7 @@ public class SimpleNeuralNet
     // Randomly change network weights
     // Swap: completely change a weight to a value between [-1;1]*swap_strength
     // Eps: change a weight by adding a value between [-1;1]*eps_strength
-    public void mutate(float swap_rate, float eps_rate, float swap_strength, float eps_strength)
+    public void mutate(float swap_rate, float eps_rate, float eps_strength)
     {
         foreach (float[,] weights in allWeights)
         {
@@ -93,11 +107,11 @@ public class SimpleNeuralNet
                     float rand = UnityEngine.Random.value;
                     if (rand < swap_rate)
                     {
-                        weights[i, j] = (2.0f * UnityEngine.Random.value - 1.0f) * swap_strength;
+                        weights[i, j] = initWeight();
                     }
                     else if (rand < swap_rate + eps_rate)
                     {
-                        weights[i, j] += (2.0f * UnityEngine.Random.value - 1.0f) * eps_strength;
+                        weights[i, j] += initWeight() * eps_strength;
                     }
                 }
             }

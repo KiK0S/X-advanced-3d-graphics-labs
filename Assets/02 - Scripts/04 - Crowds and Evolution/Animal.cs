@@ -9,12 +9,13 @@ public class Animal : MonoBehaviour
 {
 
     [Header("Animal parameters")]
-    public float swapRate = 0.01f;
-    public float mutateRate = 0.01f;
-    public float swapStrength = 10.0f;
+    public float swapRate = 0.05f;
+    public float mutateRate = 0.05f;
     public float mutateStrength = 0.5f;
     public float mutateDecay = 0.9f;
     public float maxAngle = 10.0f;
+    public float minVariance = 0.1f;
+    public float maxVariance = 5.0f;
     public float maxSpeed = 10.0f;
     [HideInInspector]
     public int generation = 0;
@@ -72,7 +73,7 @@ public class Animal : MonoBehaviour
 
         MakeNetworkInput(visionInfo, geoInfo, dayInfo);
 
-        energy = maxEnergy;
+        energy = maxEnergy / 2.0f;
         tfm = transform;
         dayNightSystem = FindObjectOfType<DayNightLighting>();
 
@@ -135,17 +136,32 @@ public class Animal : MonoBehaviour
         
         UpdateGeo();
 
+        UpdateDay();
+
         MakeNetworkInput(visionInfo, geoInfo, dayInfo);
 
 
-        // 2. Use brain.
+        // 2. Use brain to get mean and variance
         float[] output = brain.getOutput(networkInput);
+        
+        // Mean angle from first output (mapped from [0,1] to [-maxAngle, maxAngle])
+        float meanAngle = (output[0] * 2.0f - 1.0f) * maxAngle;
+        
+        // Variance from second output (clamped between min and max variance)
+        float variance = Mathf.Lerp(minVariance, maxVariance, output[1]);
+        
+        // Sample from Gaussian distribution using Box-Muller transform
+        float u1 = UnityEngine.Random.value;
+        float u2 = UnityEngine.Random.value;
+        float randStdNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
+        
+        // Apply the sampled angle
+        float finalAngle = meanAngle + randStdNormal * Mathf.Sqrt(variance);
+        finalAngle = Mathf.Clamp(finalAngle, -maxAngle, maxAngle);
+        
+        tfm.Rotate(0.0f, finalAngle, 0.0f);
 
-        // 3. Act using actuators.
-        float angle = (output[0] * 2.0f - 1.0f) * maxAngle;
-        tfm.Rotate(0.0f, angle, 0.0f);
-
-    }
+}
 
     private void UpdateGeo() {
         geoInfo[0] = tfm.position.x;
@@ -216,6 +232,32 @@ public class Animal : MonoBehaviour
         }
     }
 
+    private void LogNetwork(float[] visionInfo, float[] geoInfo, float[] dayInfo, float meanAngle, float variance, float finalAngle) {
+        string inputStr = "Network inputs:\nVision: ";
+        for (int i = 0; i < visionInfo.Length; i++) {
+            inputStr += visionInfo[i].ToString("F3");
+            if (i < visionInfo.Length - 1) {
+                inputStr += ", ";
+            }
+        }
+        inputStr += "\nPosition: ";
+        for (int i = 0; i < geoInfo.Length; i++) {
+            inputStr += geoInfo[i].ToString("F3");
+            if (i < geoInfo.Length - 1) {
+                inputStr += ", ";
+            }
+        }
+        inputStr += "\nDay/Night: ";
+        for (int i = 0; i < dayInfo.Length; i++) {
+            inputStr += dayInfo[i].ToString("F3");
+            if (i < dayInfo.Length - 1) {
+                inputStr += ", ";
+            }
+        }
+        Debug.Log(inputStr);
+        Debug.Log("Generated from " + meanAngle + " with variance " + variance + ", final angle: " + finalAngle);
+    }
+
     public void Setup(CustomTerrain ct, GeneticAlgo ga)
     {
         terrain = ct;
@@ -235,7 +277,7 @@ public class Animal : MonoBehaviour
     {
         brain = new SimpleNeuralNet(other);
         if (mutate)
-            brain.mutate(swapRate, mutateRate, swapStrength, mutateStrength * Mathf.Pow(mutateDecay, generation));
+            brain.mutate(swapRate, mutateRate, mutateStrength * Mathf.Pow(mutateDecay, generation));
     }
     public SimpleNeuralNet GetBrain()
     {
@@ -256,7 +298,7 @@ public class Animal : MonoBehaviour
                 inputSize += input.Length;
             }
             networkInput = new float[inputSize];
-            networkStruct = new int[] { inputSize, 3, 1 };
+            networkStruct = new int[] { inputSize, 3, 2 };
         }
         int index = 0;
         foreach (float[] input in inputs) {
