@@ -118,4 +118,26 @@ public class SimpleNeuralNet
         }
     }
 
+    public string SerializeWeights() {
+        string json = "{\"weights\":[";
+        for (int idxLayer = 0; idxLayer < allWeights.Count; idxLayer++)
+        {
+            float[,] weights = allWeights[idxLayer];
+            for (int i = 0; i < weights.GetLength(0); i++)
+            {
+                json += "[";
+                for (int j = 0; j < weights.GetLength(1); j++)
+                {
+                    json += weights[i, j].ToString();
+                    if (j < weights.GetLength(1) - 1)
+                        json += ",";
+                }
+                json += "]";
+            }
+            if (idxLayer < allWeights.Count - 1)
+                json += ",";
+        }
+        json += "]}";
+        return json;
+    }
 }

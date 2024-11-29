@@ -308,4 +308,10 @@ public class Animal : MonoBehaviour
             }
         }
     }
+
+    public string ExportNetworkWeights()
+    {
+        if (brain == null) return "";
+        return brain.SerializeWeights();
+    }
 }
