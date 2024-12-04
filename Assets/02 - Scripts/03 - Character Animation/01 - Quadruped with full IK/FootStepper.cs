@@ -19,6 +19,7 @@ public class FootStepper : MonoBehaviour
     // Flag to define when a leg is moving.
     public bool Moving;
 
+
     // Awake is called when the script instance is being loaded.
     void Awake()
     {
@@ -48,11 +49,11 @@ public class FootStepper : MonoBehaviour
 
         // START TODO ###################
 
-        // float distFromHome = ...
-        // float angleFromHome = ...
+        float distFromHome = Vector3.Distance(transform.position, homeTransform.position);
+        float angleFromHome = Quaternion.Angle(transform.rotation, homeTransform.rotation);
 
         // Change condition!
-        if (false)
+        if (distFromHome > distanceThreshold || angleFromHome > angleThreshold)
         {
             // END TODO ###################
 
@@ -103,19 +104,22 @@ public class FootStepper : MonoBehaviour
 
         // START TODO ###################
 
-        // Vector3 raycastOrigin = ...
+        float verticalDisplacement = 0.01f;
+        Vector3 raycastOrigin = homeTransform.position + overshootVector + new Vector3(0, verticalDisplacement, 0);
 
-        // if (Physics.Raycast(...))
-        // {
-        //  ...
-        //  return true;
-        // }
+        RaycastHit hit;
+        if (Physics.Raycast(raycastOrigin, Vector3.down, out hit, Mathf.Infinity))
+        {
+            endPos = hit.point;
+            endNormal = hit.normal;
+            return true;
+        } else {
+            endPos = Vector3.zero;
+            endNormal = Vector3.zero;
+            return false;
+        }
 
         // END TODO ###################
-
-        endPos = Vector3.zero;
-        endNormal = Vector3.zero;
-        return false;
     }
 
     /// <summary>
@@ -163,7 +167,7 @@ public class FootStepper : MonoBehaviour
 
             // START TODO ###################
 
-            // transform.position = ...
+            transform.position = Vector3.Lerp(startPos, endPos, normalizedTime);
 
             // END TODO ###################
 
@@ -172,8 +176,8 @@ public class FootStepper : MonoBehaviour
              */
 
             // START TODO ###################
-
-            // transform.rotation = ...
+            
+            transform.rotation = Quaternion.Lerp(startRot, endRot, normalizedTime);
 
             // END TODO ###################
 

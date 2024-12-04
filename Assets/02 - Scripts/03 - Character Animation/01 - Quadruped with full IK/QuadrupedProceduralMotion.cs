@@ -154,7 +154,7 @@ public class QuadrupedProceduralMotion : MonoBehaviour
         // The ray information gives you where you hit and the normal of the terrain in that location.
         if (Physics.Raycast(raycastOrigin, -transform.up, out RaycastHit hit, Mathf.Infinity))
         {
-            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            if (hit.transform.gameObject.tag == "Ground")
             {
                 posHit = hit.point;
                 distanceHit = hit.distance;
@@ -171,8 +171,9 @@ public class QuadrupedProceduralMotion : MonoBehaviour
 
         // START TODO ###################
 
-        // hips.position = ...
-        // hips.rotation = ...
+        hips.position = new Vector3(hips.position.x, hit.point.y + 1.0f, hips.position.z);
+        Quaternion targetRotation = Quaternion.FromToRotation(hips.forward, hit.normal);
+        hips.rotation = Quaternion.Slerp(hips.rotation, targetRotation, 10.0f * Time.deltaTime);
 
         // END TODO ###################
     }
@@ -233,10 +234,12 @@ public class QuadrupedProceduralMotion : MonoBehaviour
 
         // START TODO ###################
 
-        // goalWorldLookDir = ...
-        // goalLocalLookDir = ...
+        goalWorldLookDir = goal.position - headBone.position;
+        goalLocalLookDir = headBone.parent.InverseTransformDirection(goalWorldLookDir);
 
-        Quaternion targetLocalRotation = Quaternion.identity; // Change!
+        Vector3 currentForward = headBone.forward;
+        Vector3 newForward = Vector3.RotateTowards(currentForward, goalLocalLookDir, Time.deltaTime, 0f);
+        Quaternion targetLocalRotation = Quaternion.LookRotation(newForward);
 
         // END TODO ###################
 
