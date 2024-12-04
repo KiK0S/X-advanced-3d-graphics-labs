@@ -801,7 +801,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: -1.6669787e+29}
+  m_BoundingSphereOverride: {x: 4.3206e-41, y: 1.0045e-41, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -834,7 +834,7 @@ GameObject:
   - component: {fileID: 190085844}
   - component: {fileID: 190085843}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: ScreenshotButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -956,7 +956,7 @@ GameObject:
   - component: {fileID: 208777288}
   - component: {fileID: 208777290}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: ExportButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1111,7 +1111,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -400, y: 0}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &242890662
 MonoBehaviour:
@@ -1868,7 +1868,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &534669906
 MonoBehaviour:
@@ -2047,7 +2047,8 @@ MonoBehaviour:
   saveWeightsButton: {fileID: 208777290}
   saveScreenshotButton: {fileID: 190085843}
   followButton: {fileID: 1067933636}
-  mainCamera: {fileID: 1761332335}
+  mainCamera: {fileID: 534669904}
+  followingCamera: {fileID: 1761332335}
 --- !u!4 &736563369
 Transform:
   m_ObjectHideFlags: 0
@@ -2654,7 +2655,7 @@ GameObject:
   - component: {fileID: 1067933637}
   - component: {fileID: 1067933636}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: FollowButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3050,7 +3051,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: Screenshot
 --- !u!222 &1268050933
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3519,7 +3520,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 637910a5589889d86b0972da1576e86a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vegetationGrowthRate: 10
+  initialVegetation: 1000
+  vegetationGrowthRate: 3
   lowGrassThreshold: 30
   highGrassThreshold: 65
 --- !u!4 &1614883768
@@ -3815,7 +3817,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: 'Follow
+
+'
 --- !u!222 &1660858270
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3901,13 +3905,13 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: 0
+  m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 2
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -3929,7 +3933,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1822113347
 GameObject:
@@ -4082,7 +4086,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: Weights
 --- !u!222 &1912908044
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4802,8 +4806,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
+      propertyPath: maxSpeed
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
       propertyPath: swapRate
-      value: 0.1
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
@@ -4817,18 +4826,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
-      propertyPath: mutateRate
+      propertyPath: lossEnergy
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
+      propertyPath: mutateRate
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: spawnChance
-      value: 0.1
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: mutateStrength
-      value: 0.02
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}

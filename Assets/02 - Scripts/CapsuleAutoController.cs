@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class CapsuleAutoController : MonoBehaviour {
 
-    public float max_speed = 0.5f;
     protected Terrain terrain;
     protected CustomTerrain cterrain;
+    protected Animal animal;
     protected float width, height;
 
     void Start() {
@@ -16,12 +16,13 @@ public class CapsuleAutoController : MonoBehaviour {
         cterrain = terrain.GetComponent<CustomTerrain>();
         width = terrain.terrainData.size.x;
         height = terrain.terrainData.size.z;
+        animal = GetComponent<Animal>();
     }
 
     void Update() {
         Vector3 scale = terrain.terrainData.heightmapScale;
         Transform tfm = transform;
-        Vector3 v = tfm.rotation * Vector3.forward * max_speed;
+        Vector3 v = tfm.rotation * Vector3.forward * animal.GetSpeed();
         Vector3 loc = tfm.position + v;
         if (loc.x < 0)
             loc.x += width;

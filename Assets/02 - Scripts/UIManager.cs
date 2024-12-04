@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     public Button saveScreenshotButton;
     public Button followButton;
     public Camera mainCamera;
+    public Camera followingCamera;
     
     private Animal[] animals;
     private GeneticAlgo geneticAlgo;
@@ -62,7 +63,11 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < animals.Length; i++)
         {
             animalSelector.options.Add(new Dropdown.OptionData($"Animal {i} (Gen {animals[i].generation})"));
+            if (isFollowing && animals[i].transform == targetToFollow) {
+                animalSelector.value = i;
+            }
         }
+
         
         animalSelector.RefreshShownValue();
     }
@@ -111,11 +116,8 @@ public class UIManager : MonoBehaviour
                 isFollowing = true;
                 followButton.GetComponentInChildren<Text>().text = "Stop Following";
                 
-                // Switch to main camera display
-                if (mainCamera != null)
-                {
-                    Display.displays[2].Activate();
-                }
+                mainCamera.enabled = false;
+                followingCamera.enabled = true;
             }
         }
         else
@@ -123,11 +125,14 @@ public class UIManager : MonoBehaviour
             // Stop following
             isFollowing = false;
             followButton.GetComponentInChildren<Text>().text = "Follow Animal";
-            if (mainCamera != null && cameraOriginalTransform != null)
+            if (followingCamera != null && cameraOriginalTransform != null)
             {
-                mainCamera.transform.position = cameraOriginalTransform.position;
-                mainCamera.transform.rotation = cameraOriginalTransform.rotation;
+                followingCamera.transform.position = cameraOriginalTransform.position;
+                followingCamera.transform.rotation = cameraOriginalTransform.rotation;
             }
+            mainCamera.enabled = true;
+            followingCamera.enabled = false;
+
         }
     }
 
@@ -158,15 +163,15 @@ public class UIManager : MonoBehaviour
 
     void LateUpdate()
     {
-        if (isFollowing && mainCamera != null)
+        if (isFollowing && followingCamera != null)
         {
             CheckAndSwitchTarget();
             
             if (targetToFollow != null)
             {
                 Vector3 targetPosition = targetToFollow.position;
-                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetPosition + new Vector3(0, 10, -10), Time.deltaTime * 5f);
-                mainCamera.transform.LookAt(targetToFollow);
+                followingCamera.transform.position = Vector3.Lerp(followingCamera.transform.position, targetPosition + new Vector3(0, 10, -10), Time.deltaTime * 5f);
+                followingCamera.transform.LookAt(targetToFollow);
             }
         }
     }

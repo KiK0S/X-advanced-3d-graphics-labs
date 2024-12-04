@@ -3,6 +3,7 @@ using UnityEngine;
 public class GrassManager : MonoBehaviour
 {
     [Header("Growth Settings")]
+    public float initialVegetation = 0.0f;
     public float vegetationGrowthRate = 2.0f;
     [Range(0, 100)]
     public float lowGrassThreshold = 10.0f;
@@ -17,7 +18,7 @@ public class GrassManager : MonoBehaviour
     {
         customTerrain = FindObjectOfType<CustomTerrain>();
         dayNightSystem = FindObjectOfType<DayNightLighting>();
-        currentGrowth = 0.0f;
+        currentGrowth = initialVegetation;
     }
 
     void Update()

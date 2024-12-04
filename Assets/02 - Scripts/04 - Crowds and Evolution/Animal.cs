@@ -16,7 +16,9 @@ public class Animal : MonoBehaviour
     public float maxAngle = 10.0f;
     public float minVariance = 0.1f;
     public float maxVariance = 5.0f;
-    public float maxSpeed = 10.0f;
+    public float minSpeed = 0.05f;
+    public float maxSpeed = 0.5f;
+    private float speed = 0.0f;
     [HideInInspector]
     public int generation = 0;
 
@@ -161,7 +163,12 @@ public class Animal : MonoBehaviour
         
         tfm.Rotate(0.0f, finalAngle, 0.0f);
 
-}
+        speed = Mathf.Lerp(minSpeed, maxSpeed, output[2] * 2.0f - 1.0f);
+    }
+
+    public float GetSpeed() {
+        return speed;
+    }
 
     private void UpdateGeo() {
         geoInfo[0] = tfm.position.x;
@@ -298,7 +305,7 @@ public class Animal : MonoBehaviour
                 inputSize += input.Length;
             }
             networkInput = new float[inputSize];
-            networkStruct = new int[] { inputSize, 3, 2 };
+            networkStruct = new int[] { inputSize, 3, 3 };
         }
         int index = 0;
         foreach (float[] input in inputs) {
