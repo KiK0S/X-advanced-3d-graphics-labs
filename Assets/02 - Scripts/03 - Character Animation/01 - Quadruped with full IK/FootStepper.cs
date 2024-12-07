@@ -167,7 +167,11 @@ public class FootStepper : MonoBehaviour
 
             // START TODO ###################
 
-            transform.position = Vector3.Lerp(startPos, endPos, normalizedTime);
+            float stepHeight = 0.5f;
+            Vector3 middlePos = (startPos + endPos) / 2 + Vector3.up * stepHeight;
+            transform.position = Mathf.Pow(1 - normalizedTime, 2) * startPos +
+                         2 * (1 - normalizedTime) * normalizedTime * middlePos +
+                         Mathf.Pow(normalizedTime, 2) * endPos;
 
             // END TODO ###################
 
@@ -177,7 +181,7 @@ public class FootStepper : MonoBehaviour
 
             // START TODO ###################
             
-            transform.rotation = Quaternion.Lerp(startRot, endRot, normalizedTime);
+            transform.rotation = Quaternion.Slerp(startRot, endRot, normalizedTime);
 
             // END TODO ###################
 
