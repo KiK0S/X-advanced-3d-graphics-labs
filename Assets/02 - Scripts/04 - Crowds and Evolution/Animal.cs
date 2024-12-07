@@ -59,7 +59,7 @@ public class Animal : MonoBehaviour
     private DayNightLighting dayNightSystem;
 
     // Renderer.
-    private Material mat = null;
+    private Material[] mats = null;
 
     private float speedCoeff = 0.0f;
 
@@ -79,11 +79,14 @@ public class Animal : MonoBehaviour
         tfm = transform;
         dayNightSystem = FindObjectOfType<DayNightLighting>();
 
-        // Renderer used to update animal color.
-        // It needs to be updated for more complex models.
-        MeshRenderer renderer = GetComponentInChildren<MeshRenderer>();
-        if (renderer != null)
-            mat = renderer.material;
+        // Get all mesh renderers and their materials
+        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+        List<Material> materialsList = new List<Material>();
+        foreach (MeshRenderer renderer in renderers)
+        {
+            materialsList.AddRange(renderer.materials);
+        }
+        mats = materialsList.ToArray();
     }
 
     void Update()
@@ -129,9 +132,37 @@ public class Animal : MonoBehaviour
             return;
         }
 
-        // Update the color of the animal as a function of the energy that it contains.
-        if (mat != null)
-            mat.color = Color.white * (energy / maxEnergy);
+        // Update the color of all materials based on energy and vision
+        if (mats != null && mats.Length > 0)
+        {
+            // Calculate the base brightness from energy
+            float brightness = energy / maxEnergy;
+            
+            // Calculate green component based on weighted vision input
+            float totalVision = 0f;
+            float maxPossibleVision = nEyes * (1f / 1f); // Maximum possible vision value per eye
+            
+            foreach (float vision in visionInfo)
+            {
+                totalVision += vision;
+            }
+            
+            // Normalize the green component (0 to 1 range)
+            float greenComponent = Mathf.Clamp01(totalVision / maxPossibleVision);
+            
+            // Create the final color: base brightness for R&B, enhanced green
+            Color newColor = new Color(
+                brightness,                    // Red
+                Mathf.Clamp01(brightness + greenComponent * 0.5f),  // Green (boosted by vision)
+                brightness                     // Blue
+            );
+            
+            // Apply to all materials
+            foreach (Material mat in mats)
+            {
+                mat.color = newColor;
+            }
+        }
 
         // 1. Update receptor.
         UpdateVision();
