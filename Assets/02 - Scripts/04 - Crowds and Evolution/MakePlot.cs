@@ -7,57 +7,100 @@ public class MakePlot : MonoBehaviour
 {
     public GameObject pointPrefab;  // Prefab for the point (a UI Image)
     public RectTransform canvasRectTransform;  // Canvas RectTransform
+    
+    [System.Serializable]
+    public class DataStream
+    {
+        public string name;
+        public Color color;
+        public List<float> values = new List<float>();
+    }
+    
+    public List<DataStream> dataStreams = new List<DataStream>();
     private List<GameObject> pointInstances = new List<GameObject>();
-    private List<int> dataPoints = new List<int>();
     private GeneticAlgo geneticAlgo;
+    private CustomTerrain customTerrain;
     protected int timer = 0;
-    // Start is called before the first frame update
+
     void Start()
     {
         geneticAlgo = FindObjectOfType<GeneticAlgo>();
+        customTerrain = FindObjectOfType<CustomTerrain>();
+        
+        // Initialize data streams
+        dataStreams.Add(new DataStream { 
+            name = "Animals", 
+            color = Color.green 
+        });
+        dataStreams.Add(new DataStream { 
+            name = "Grass", 
+            color = Color.red 
+        });
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (timer++ % 20 == 0) {
-            dataPoints.Add(geneticAlgo.getAnimalNum());
+            // Update animal count
+            dataStreams[0].values.Add(geneticAlgo.getAnimalNum());
+            
+            // Update grass count
+            int grassCount = 0;
+            int[,] details = customTerrain.getDetails();
+            for (int i = 0; i < details.GetLength(0); i++) {
+                for (int j = 0; j < details.GetLength(1); j++) {
+                    if (details[i, j] > 0) grassCount++;
+                }
+            }
+            dataStreams[1].values.Add(grassCount);
+            
             UpdatePlot();
         }
     }
 
     public void UpdatePlot(bool erase_only=false) {
-        if (dataPoints.Count < 2)
-            return;
-
-        Vector3[] positions = new Vector3[dataPoints.Count];
-        
+        // Clear existing points
         foreach (GameObject point in pointInstances)
         {
             Destroy(point);
         }
+        pointInstances.Clear();
         
-        if (erase_only)
+        if (erase_only || dataStreams[0].values.Count < 2)
             return;
-        
-        while (dataPoints.Count > 100) {
-            dataPoints.RemoveAt(0);
+
+        // Trim data points if too many
+        foreach (var stream in dataStreams) {
+            while (stream.values.Count > 100) {
+                stream.values.RemoveAt(0);
+            }
         }
 
-        int max_cnt = dataPoints[0];
-        foreach (int x in dataPoints) {
-            max_cnt = Math.Max(max_cnt, x);
-        }
- 
-        for (int i = 0; i < dataPoints.Count; i++)
-        {
-            float y = Mathf.Lerp(0f, canvasRectTransform.rect.height, (float)dataPoints[i] / max_cnt);
-            float x = Mathf.Lerp(0f, canvasRectTransform.rect.width, (float)i / (dataPoints.Count - 1));
+        // Plot each data stream with its own normalization
+        foreach (var stream in dataStreams) {
+            // Find maximum value for this stream
+            float maxValue = float.MinValue;
+            foreach (float value in stream.values) {
+                maxValue = Mathf.Max(maxValue, value);
+            }
             
-            GameObject pointInstance = Instantiate(pointPrefab, canvasRectTransform);
-
-            pointInstances.Add(pointInstance);
-            pointInstance.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+            // Plot points for this stream
+            for (int i = 0; i < stream.values.Count; i++)
+            {
+                float y = Mathf.Lerp(0f, canvasRectTransform.rect.height, stream.values[i] / maxValue);
+                float x = Mathf.Lerp(0f, canvasRectTransform.rect.width, (float)i / (stream.values.Count - 1));
+                
+                GameObject pointInstance = Instantiate(pointPrefab, canvasRectTransform);
+                pointInstances.Add(pointInstance);
+                
+                // Set point color
+                UnityEngine.UI.Image image = pointInstance.GetComponent<UnityEngine.UI.Image>();
+                if (image != null) {
+                    image.color = stream.color;
+                }
+                
+                pointInstance.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+            }
         }
     }
 }
