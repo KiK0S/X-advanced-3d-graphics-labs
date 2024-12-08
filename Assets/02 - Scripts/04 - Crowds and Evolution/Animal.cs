@@ -27,8 +27,11 @@ public class Animal : MonoBehaviour
     public float initEnergy = 100.0f;
     public float lossEnergy = 0.1f;
     public float gainEnergy = 20.0f;
+    public float maxWaterEnergy = 50.0f;
+    public float lossWaterEnergy = 0.0f;
     public float spawnEnergyRequired = 3.0f;
     public float energy;
+    public float waterEnergy;
 
     [Header("Sensor - Vision")]
     public float maxVision = 20.0f;
@@ -84,6 +87,7 @@ public class Animal : MonoBehaviour
         MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
 
         energy = initEnergy;
+        waterEnergy = maxWaterEnergy;
         tfm = transform;
         dayNightSystem = FindObjectOfType<DayNightLighting>();
 
@@ -118,6 +122,7 @@ public class Animal : MonoBehaviour
 
         // For each frame, we lose lossEnergy
         energy -= lossEnergy;
+        waterEnergy -= lossWaterEnergy;
         timeOfLife += Time.deltaTime;
         // If the animal is located in the dimensions of the terrain and over a grass position (details[dy, dx] > 0), it eats it, gain energy and spawn an offspring.
         int[] offsetsX = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
@@ -136,9 +141,15 @@ public class Animal : MonoBehaviour
         }
         if (eated && shouldSpawn())
             spawnOffspring();
-
+        
+        //If in water set water energy to maximum
+        if (tfm.position.y <= 15f)
+        {
+            waterEnergy = maxWaterEnergy;
+        }
+        
         // If the energy is below 0, the animal dies.
-        if (energy < 0)
+        if (energy < 0 || waterEnergy < 0)
         {
             energy = 0.0f;
             genetic_algo.removeAnimal(this);
