@@ -4926,16 +4926,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homeTransform: {fileID: 2954251903139554732}
-  distanceThreshold: 0.45
-  angleThreshold: 135
-  moveDuration: 0.125
-  stepOvershootFraction: 0.75
   groundRaycastMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  heightOffset: 0.1
   Moving: 0
   cterrain: {fileID: 0}
+  targetRoot: {fileID: 0}
 --- !u!1 &2954251902890950201
 GameObject:
   m_ObjectHideFlags: 0
@@ -5033,16 +5029,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homeTransform: {fileID: 2954251904250419953}
-  distanceThreshold: 0.45
-  angleThreshold: 135
-  moveDuration: 0.125
-  stepOvershootFraction: 0.75
   groundRaycastMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  heightOffset: 0.1
   Moving: 0
   cterrain: {fileID: 0}
+  targetRoot: {fileID: 0}
 --- !u!1 &2954251903069469996
 GameObject:
   m_ObjectHideFlags: 0
@@ -5140,16 +5132,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homeTransform: {fileID: 2954251904142021964}
-  distanceThreshold: 0.45
-  angleThreshold: 135
-  moveDuration: 0.125
-  stepOvershootFraction: 0.75
   groundRaycastMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  heightOffset: 0.1
   Moving: 0
   cterrain: {fileID: 0}
+  targetRoot: {fileID: 0}
 --- !u!1 &2954251903116196026
 GameObject:
   m_ObjectHideFlags: 0
@@ -5664,7 +5652,7 @@ ParentConstraint:
   m_TranslationOffsets:
   - {x: -0.9299927, y: -0.45629883, z: -1.6437378}
   m_RotationOffsets:
-  - {x: 3.0129883, y: -60.13759, z: -5.2307153}
+  - {x: 3.0129874, y: -60.13759, z: -5.230716}
   m_AffectTranslationX: 1
   m_AffectTranslationY: 1
   m_AffectTranslationZ: 1
@@ -5953,7 +5941,7 @@ ParentConstraint:
   m_TranslationOffsets:
   - {x: 0.9299927, y: -0.45629883, z: -1.6437378}
   m_RotationOffsets:
-  - {x: 3.012983, y: 60.137638, z: 5.230717}
+  - {x: 3.0129821, y: 60.137646, z: 5.2307177}
   m_AffectTranslationX: 1
   m_AffectTranslationY: 1
   m_AffectTranslationZ: 1
@@ -6288,16 +6276,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homeTransform: {fileID: 2954251903923410751}
-  distanceThreshold: 0.45
-  angleThreshold: 135
-  moveDuration: 0.125
-  stepOvershootFraction: 0.75
   groundRaycastMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  heightOffset: 0.1
   Moving: 0
   cterrain: {fileID: 0}
+  targetRoot: {fileID: 0}
 --- !u!1 &2954251904686213912
 GameObject:
   m_ObjectHideFlags: 0
@@ -7305,6 +7289,7 @@ MonoBehaviour:
   frontRightFoot: {fileID: 2954251902850376964}
   backLeftFoot: {fileID: 2954251904603069286}
   backRightFoot: {fileID: 2954251903069469998}
+  targetRoot: {fileID: 0}
   cterrain: {fileID: 0}
 --- !u!114 &4260771671356014993
 MonoBehaviour:
@@ -7318,35 +7303,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0cc07004fd40a196e4058316a4276, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swapRate: 0.05
-  mutateRate: 0.05
-  mutateStrength: 0.5
-  mutateDecay: 0.9
-  maxAngle: 10
-  minVariance: 0.1
-  maxVariance: 5
-  minSpeed: 0.05
-  maxSpeed: 0.5
   generation: 0
-  maxEnergy: 50
-  initEnergy: 100
-  lossEnergy: 0.1
-  gainEnergy: 20
-  maxWaterEnergy: 50
-  lossWaterEnergy: 0
-  spawnEnergyRequired: 3
   energy: 0
   waterEnergy: 0
-  maxVision: 20
-  stepAngle: 10
-  nEyes: 5
-  spawnChance: 0.1
   hips: {fileID: 0}
   goal: {fileID: 0}
   goalRoot: {fileID: 0}
   timeOfLife: 0
-  maxGoalDistance: 10
-  goalUpdateRate: 0.5
 --- !u!1 &8107060311548940700
 GameObject:
   m_ObjectHideFlags: 0

@@ -60,31 +60,45 @@ public class QuadrupedProceduralMotion : MonoBehaviour
 
     protected Terrain terrain;
     public CustomTerrain cterrain;
-
+    private GameObject localTargetRoot;
     // Awake is called when the script instance is being loaded.
-    void Awake()
+    void Start()
     {
+        terrain = Terrain.activeTerrain;
+        cterrain = terrain.GetComponent<CustomTerrain>();
+        
+        localTargetRoot = new GameObject("local target root");
+        localTargetRoot.transform.SetParent(targetRoot);
+
+        StartCoroutine(DelayedSetup());
+    }
+
+    private IEnumerator DelayedSetup()
+    {
+        // Wait for a frame to ensure all components are initialized
+        yield return null;
+        
+        // Set target roots
+        frontLeftFoot.targetRoot = localTargetRoot.transform;
+        frontRightFoot.targetRoot = localTargetRoot.transform;
+        backLeftFoot.targetRoot = localTargetRoot.transform;
+        backRightFoot.targetRoot = localTargetRoot.transform;
+        
+        // Setup feet
+        frontLeftFoot.Setup();
+        frontRightFoot.Setup();
+        backLeftFoot.Setup();
+        backRightFoot.Setup();
+        
         StartCoroutine(Gait());
         TailInitialize();
         BodyInitialize();
-        terrain = Terrain.activeTerrain;
-        cterrain = terrain.GetComponent<CustomTerrain>();
-        GameObject localTargetRoot = new GameObject("local target root");
-        localTargetRoot.transform.SetParent(targetRoot);
-        frontLeftFoot = Instantiate(frontLeftFoot);
-        frontLeftFoot.transform.SetParent(localTargetRoot.transform);
-        frontRightFoot = Instantiate(frontRightFoot);
-        frontRightFoot.transform.SetParent(localTargetRoot.transform);
-        backLeftFoot = Instantiate(backLeftFoot);
-        backLeftFoot.transform.SetParent(localTargetRoot.transform);
-        backRightFoot = Instantiate(backRightFoot);
-        backRightFoot.transform.SetParent(localTargetRoot.transform);
     }
 
     // Update is called every frame, if the MonoBehaviour is enabled.
     private void Update()
     {        
-        if (goal == null || goal.position.x == 0) {
+        if (goal == null) {
             goal = this.GetComponent<Animal>().goal;
         }
 

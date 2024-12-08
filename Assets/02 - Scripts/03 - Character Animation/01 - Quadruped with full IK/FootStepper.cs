@@ -17,18 +17,17 @@ public class FootStepper : MonoBehaviour
     private ParameterManager parameters;
     public Transform targetRoot;
 
-    void Start() {
+    // void Start() {
+    // }
+
+    // Awake is called when the script instance is being loaded.
+    public void Setup()
+    {
         parameters = ParameterManager.Instance;
         terrain = Terrain.activeTerrain;
         cterrain = terrain.GetComponent<CustomTerrain>();
-    }
-
-    // Awake is called when the script instance is being loaded.
-    void Awake()
-    {
         // We put the steppers at the top of the hierarchy, to avoid other influences from the parent transforms and to see them better.
-        // transform.SetParent(targetRoot);
-        transform.position = targetRoot.position;
+        transform.SetParent(targetRoot);
         // Adapt the legs just after starting the script.
         MoveLeg();
     }
@@ -44,8 +43,9 @@ public class FootStepper : MonoBehaviour
             return;
         }
 
-        if (terrain == null) 
-            Start();
+        if (parameters == null) {
+            Setup();
+        }
 
         /*
          * First, we want to calculate the distance from the GameObject where this script is attached (target, red sphere) to the home position of the respective leg (blue chip).
