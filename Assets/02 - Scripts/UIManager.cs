@@ -90,7 +90,7 @@ public class UIManager : MonoBehaviour
             // Create eye visualizer circles if they don't exist
             if (eyeVisualizerPanel != null && eyeCircles == null)
             {
-                CreateEyeVisualizers(selectedAnimal.nEyes);
+                CreateEyeVisualizers(selectedAnimal.GetEyes());
             }
         }
     }

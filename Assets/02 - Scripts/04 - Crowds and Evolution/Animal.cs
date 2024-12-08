@@ -8,43 +8,16 @@ using UnityEngine.UI;
 public class Animal : MonoBehaviour
 {
 
-    [Header("Animal parameters")]
-    public float swapRate = 0.05f;
-    public float mutateRate = 0.05f;
-    public float mutateStrength = 0.5f;
-    public float mutateDecay = 0.9f;
-    public float maxAngle = 10.0f;
-    public float minVariance = 0.1f;
-    public float maxVariance = 5.0f;
-    public float minSpeed = 0.05f;
-    public float maxSpeed = 0.5f;
     private float speed = 0.0f;
     [HideInInspector]
     public int generation = 0;
-
-    [Header("Energy parameters")]
-    public float maxEnergy = 50.0f;
-    public float initEnergy = 100.0f;
-    public float lossEnergy = 0.1f;
-    public float gainEnergy = 20.0f;
-    public float maxWaterEnergy = 50.0f;
-    public float lossWaterEnergy = 0.0f;
-    public float spawnEnergyRequired = 3.0f;
     public float energy;
     public float waterEnergy;
-
-    [Header("Sensor - Vision")]
-    public float maxVision = 20.0f;
-    public float stepAngle = 10.0f;
-    public int nEyes = 5;
-
-    [Header("Spawning")]
-    public float spawnChance = 0.1f;
-
 
     [Header("Goal")]
     public Transform hips = null;
     public Transform goal = null;
+    public Transform goalRoot = null;
 
     private int[] networkStruct;
     private SimpleNeuralNet brain = null;
@@ -64,7 +37,7 @@ public class Animal : MonoBehaviour
     private float[] networkInput;
     private int outputs = 4;
 
-
+    private ParameterManager parameters;
     // Genetic alg.
     private GeneticAlgo genetic_algo = null;
 
@@ -78,15 +51,16 @@ public class Animal : MonoBehaviour
     public float timeOfLife = 0.0f;
     private bool isDestroyed = false;
 
-    [Header("Movement")]
-    public float maxGoalDistance = 2.0f;  // Reduced from 10 to make steps more manageable
-    public float goalUpdateRate = 0.5f;   // How often to update goal position
     private float goalUpdateTimer = 0f;
 
     void Start()
     {
+        parameters = ParameterManager.Instance;
+        GameObject goalObj = new GameObject("Goal");
+        goal = goalObj.transform;
+        goal.SetParent(goalRoot);
         // Network: 1 input per receptor, 1 output per actuator.
-        visionInfo = new float[nEyes];
+        visionInfo = new float[parameters.nEyes];
         geoInfo = new float[3];
         dayInfo = new float[2];
         hiddenInfo = new float[outputs + 1];
@@ -96,8 +70,8 @@ public class Animal : MonoBehaviour
 
         MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
 
-        energy = initEnergy;
-        waterEnergy = maxWaterEnergy;
+        energy = parameters.initEnergy;
+        waterEnergy = parameters.maxWaterEnergy;
         tfm = transform;
         dayNightSystem = FindObjectOfType<DayNightLighting>();
 
@@ -133,8 +107,8 @@ public class Animal : MonoBehaviour
         int dy = (int)((tfm.position.z / terrainSize.y) * detailSize.y);
 
         // For each frame, we lose lossEnergy
-        energy -= lossEnergy;
-        waterEnergy -= lossWaterEnergy;
+        energy -= parameters.lossEnergy;
+        waterEnergy -= parameters.lossWaterEnergy;
         timeOfLife += Time.deltaTime;
         // If the animal is located in the dimensions of the terrain and over a grass position (details[dy, dx] > 0), it eats it, gain energy and spawn an offspring.
         int[] offsetsX = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
@@ -144,9 +118,9 @@ public class Animal : MonoBehaviour
             foreach (int offsetY in offsetsY) {
                 if ((dx + offsetX >= 0) && (dx + offsetX < details.GetLength(1)) && (dy + offsetY >= 0) && (dy + offsetY < details.GetLength(0)) && details[dy + offsetY, dx + offsetX] > 0) {
                     details[dy + offsetY, dx + offsetX] = 0;
-                    energy += gainEnergy;
-                    if (energy > maxEnergy)
-                        energy = maxEnergy;
+                    energy += parameters.gainEnergy;
+                    if (energy > parameters.maxEnergy)
+                        energy = parameters.maxEnergy;
                     eated = true;
                 }
             }
@@ -157,7 +131,7 @@ public class Animal : MonoBehaviour
         //If in water set water energy to maximum
         if (tfm.position.y <= 15f)
         {
-            waterEnergy = maxWaterEnergy;
+            waterEnergy = parameters.maxWaterEnergy;
         }
         
         // If the energy is below 0, the animal dies.
@@ -169,14 +143,14 @@ public class Animal : MonoBehaviour
         }
 
         // Update the color of all materials based on energy and vision
-        if (mats != null && mats.Length > 0)
+        if (false && mats != null && mats.Length > 0)
         {
             // Calculate the base brightness from energy
-            float brightness = energy / maxEnergy;
+            float brightness = energy / parameters.maxEnergy;
             
             // Calculate green component based on weighted vision input
             float totalVision = 0f;
-            float maxPossibleVision = nEyes * (1f / 1f); // Maximum possible vision value per eye
+            float maxPossibleVision = parameters.nEyes * (1f / 1f); // Maximum possible vision value per eye
             
             foreach (float vision in visionInfo)
             {
@@ -214,10 +188,10 @@ public class Animal : MonoBehaviour
         float[] output = brain.getOutput(networkInput);
         
         // Mean angle from first output (mapped from [0,1] to [-maxAngle, maxAngle])
-        float meanAngle = (output[0] * 2.0f - 1.0f) * maxAngle;
+        float meanAngle = (output[0] * 2.0f - 1.0f) * parameters.maxAngle;
         
         // Variance from second output (clamped between min and max variance)
-        float variance = Mathf.Lerp(minVariance, maxVariance, output[1]);
+        float variance = Mathf.Lerp(parameters.minVariance, parameters.maxVariance, output[1]);
         
         // Sample from Gaussian distribution using Box-Muller transform
         float u1 = UnityEngine.Random.value;
@@ -226,23 +200,22 @@ public class Animal : MonoBehaviour
         
         // Apply the sampled angle
         float finalAngle = meanAngle + randStdNormal * Mathf.Sqrt(variance);
-        finalAngle = Mathf.Clamp(finalAngle, -maxAngle, maxAngle);
+        finalAngle = Mathf.Clamp(finalAngle, -parameters.maxAngle, parameters.maxAngle);
         
-
-        speed = Mathf.Lerp(minSpeed, maxSpeed, output[2] * 2.0f - 1.0f);
+        speed = Mathf.Lerp(parameters.minSpeed, parameters.maxSpeed, output[2] * 2.0f - 1.0f);
         
         for (int i = 0; i < output.Length; i++) {
             hiddenInfo[i] = output[i];
         }
 
         goalUpdateTimer += Time.deltaTime;
-        if (goalUpdateTimer >= goalUpdateRate) {
+        if (goalUpdateTimer >= parameters.goalUpdateRate) {
             goalUpdateTimer = 0f;
             
             // Calculate new goal position
             Vector3 targetDirection = Quaternion.Euler(0f, finalAngle, 0f) * hips.rotation * Vector3.forward;
             
-            goal.position = hips.position + targetDirection * maxGoalDistance;
+            goal.position = tfm.position + targetDirection.normalized * parameters.maxGoalDistance;
         }
     }
 
@@ -267,13 +240,13 @@ public class Animal : MonoBehaviour
     }
 
     private bool shouldSpawn() {
-        return energy >= spawnEnergyRequired &&
-               UnityEngine.Random.Range(0.0f, 1.0f) < spawnChance * (1.0f + timeOfLife);
+        return energy >= parameters.spawnEnergyRequired &&
+               UnityEngine.Random.Range(0.0f, 1.0f) < parameters.spawnChance * (1.0f + timeOfLife);
     }
 
     private void spawnOffspring() {
         if (genetic_algo.addOffspring(this)) {
-            energy -= spawnEnergyRequired * 2.0f / 3.0f;
+            energy -= parameters.spawnEnergyRequired * 2.0f / 3.0f;
         }
     }
 
@@ -282,20 +255,20 @@ public class Animal : MonoBehaviour
     /// </summary>
     private void UpdateVision()
     {
-        float startingAngle = -((float)nEyes / 2.0f) * stepAngle;
+        float startingAngle = -((float)parameters.nEyes / 2.0f) * parameters.stepAngle;
         Vector2 ratio = detailSize / terrainSize;
 
-        for (int i = 0; i < nEyes; i++)
+        for (int i = 0; i < parameters.nEyes; i++)
         {
-            Quaternion rotAnimal = tfm.rotation * Quaternion.Euler(0.0f, startingAngle + (stepAngle * i), 0.0f);
+            Quaternion rotAnimal = tfm.rotation * Quaternion.Euler(0.0f, startingAngle + (parameters.stepAngle * i), 0.0f);
             Vector3 forwardAnimal = rotAnimal * Vector3.forward;
             float sx = tfm.position.x * ratio.x;
             float sy = tfm.position.z * ratio.y;
             visionInfo[i] = 0.0f;
-            Debug.DrawRay(tfm.position, forwardAnimal * maxVision, Color.red);
+            Debug.DrawRay(tfm.position, forwardAnimal * parameters.maxVision, Color.red);
 
         // Interate over vision length.
-            for (float distance = 1.0f; distance < maxVision; distance += 0.5f)
+            for (float distance = 1.0f; distance < parameters.maxVision; distance += 0.5f)
             {
                 // Position where we are looking at.
                 int px = (int)(sx + (distance * forwardAnimal.x * ratio.x));
@@ -377,9 +350,10 @@ public class Animal : MonoBehaviour
 
     public void InheritBrain(SimpleNeuralNet other, bool mutate)
     {
+        Start();
         brain = new SimpleNeuralNet(other);
         if (mutate)
-            brain.mutate(swapRate, mutateRate, mutateStrength * Mathf.Pow(mutateDecay, generation));
+            brain.mutate(parameters.swapRate, parameters.mutateRate, parameters.mutateStrength * Mathf.Pow(parameters.mutateDecay, generation));
     }
     public SimpleNeuralNet GetBrain()
     {
@@ -387,7 +361,7 @@ public class Animal : MonoBehaviour
     }
     public float GetHealth()
     {
-        return energy / maxEnergy;
+        return energy / parameters.maxEnergy;
     }
     public void NoFurtherUpdates()
     {
@@ -425,5 +399,8 @@ public class Animal : MonoBehaviour
     public float[] GetLastOutputs()
     {
         return hiddenInfo;
+    }
+    public int GetEyes() {
+        return parameters.nEyes;
     }
 }

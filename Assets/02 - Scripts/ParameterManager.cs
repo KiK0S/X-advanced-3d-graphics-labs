@@ -45,6 +45,11 @@ public class ParameterManager : MonoBehaviour
     public float stepAngle = 10.0f;
     public int nEyes = 5;
     public float spawnChance = 0.1f;
+    
+    [Header("Animal Movement")]
+    public float maxGoalDistance = 10.0f;  // Reduced from 10 to make steps more manageable
+    public float goalUpdateRate = 0.5f;   // How often to update goal position
+
 
     [Header("Foot Stepper Parameters")]
     public float distanceThreshold = 0.4f;
@@ -54,7 +59,7 @@ public class ParameterManager : MonoBehaviour
     public float heightOffset = 0.1f;
 
     [Header("Population Control")]
-    public int initialPopSize = 100;
+    public int popSize = 100;
     public int maxAnimals = 1000;
 
     private void Awake()

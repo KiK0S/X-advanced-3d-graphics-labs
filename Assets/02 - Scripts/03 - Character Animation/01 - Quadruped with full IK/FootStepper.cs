@@ -6,27 +6,29 @@ public class FootStepper : MonoBehaviour
 {
     [Header("Stepper Settings")]
     public Transform homeTransform; // The position and rotation from which we want to stay in range (represented as the blue chip).
-    public float distanceThreshold = 0.4f; // If we exceed this distance threshold, we come back to the home position.
-    public float angleThreshold = 135f; // If we exceed this rotation threshold, we come back to the home rotation.
-    public float moveDuration; // The time it takes a step to complete.
-    [Range(0, 1)]
-    public float stepOvershootFraction; // To add some variability, we add a fraction to overshoot the target.
 
     [Header("Raycast Settings")]
     public LayerMask groundRaycastMask = ~0; // Ground layer that you need to detect by raycasting.
-    public float heightOffset; // Necessary when foot joints aren't exactly at the base of the foot geometry.
 
     // Flag to define when a leg is moving.
     public bool Moving;
-    public CustomTerrain terrain;
+    protected Terrain terrain;
+    public CustomTerrain cterrain;
+    private ParameterManager parameters;
+    public Transform targetRoot;
 
+    void Start() {
+        parameters = ParameterManager.Instance;
+        terrain = Terrain.activeTerrain;
+        cterrain = terrain.GetComponent<CustomTerrain>();
+    }
 
     // Awake is called when the script instance is being loaded.
     void Awake()
     {
         // We put the steppers at the top of the hierarchy, to avoid other influences from the parent transforms and to see them better.
-        // transform.SetParent(null);
-        terrain = FindObjectOfType<CustomTerrain>();
+        // transform.SetParent(targetRoot);
+        transform.position = targetRoot.position;
         // Adapt the legs just after starting the script.
         MoveLeg();
     }
@@ -42,6 +44,9 @@ public class FootStepper : MonoBehaviour
             return;
         }
 
+        if (terrain == null) 
+            Start();
+
         /*
          * First, we want to calculate the distance from the GameObject where this script is attached (target, red sphere) to the home position of the respective leg (blue chip).
          * We also calculate the quaternion between the current rotation and the home rotation.
@@ -54,7 +59,7 @@ public class FootStepper : MonoBehaviour
         float angleFromHome = Quaternion.Angle(transform.rotation, homeTransform.rotation);
 
         // Change condition!
-        if (distFromHome > distanceThreshold || angleFromHome > angleThreshold)
+        if (distFromHome > parameters.distanceThreshold || angleFromHome > parameters.angleThreshold)
         {
             // END TODO ###################
 
@@ -68,7 +73,7 @@ public class FootStepper : MonoBehaviour
                 Quaternion endRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(homeTransform.forward, endNormal), endNormal);
 
                 // Start MoveFoot coroutine with the target position, rotation and duration of the movement.
-                StartCoroutine(MoveFoot(endPos, endRot, moveDuration));
+                StartCoroutine(MoveFoot(endPos, endRot, parameters.moveDuration));
             }
         }
     }
@@ -91,7 +96,7 @@ public class FootStepper : MonoBehaviour
          */
 
         Vector3 towardsHome = (homeTransform.position - transform.position).normalized;
-        float overshootDistance = distanceThreshold * stepOvershootFraction;
+        float overshootDistance = parameters.distanceThreshold * parameters.stepOvershootFraction;
         Vector3 overshootVector = towardsHome * overshootDistance;
 
         /*
@@ -104,11 +109,14 @@ public class FootStepper : MonoBehaviour
          */
 
         // START TODO ###################
+        
+        float verticalDisplacement = 0.01f;
+        Vector3 raycastOrigin = homeTransform.position + overshootVector + new Vector3(0, verticalDisplacement, 0);
 
-        float verticalDisplacement = 0.1f;
-        endPos = homeTransform.position;
-        endPos.y = terrain.getInterp(endPos.x, endPos.z);
-        endNormal = terrain.getNormal(endPos.x, endPos.z);
+        Vector3 scale = terrain.terrainData.heightmapScale;
+        endPos = homeTransform.position + overshootVector + new Vector3(0, verticalDisplacement, 0);
+        endPos.y = cterrain.getInterp(endPos.x/scale.x, endPos.z/scale.z);
+        endNormal = cterrain.getNormal(endPos.x/scale.x, endPos.z/scale.z);
         return true;
         // END TODO ###################
     }
@@ -131,7 +139,7 @@ public class FootStepper : MonoBehaviour
 
         // Apply the height offset to the home position, where we will move towards.
         // You can change the heightOffset to see the effect. It just changes the vertical component to modify where the IK target is.
-        endPos += homeTransform.up * heightOffset;
+        endPos += homeTransform.up * parameters.heightOffset;
 
         // Initialize the time.
         float timeElapsed = 0;
@@ -179,7 +187,7 @@ public class FootStepper : MonoBehaviour
             // Wait for one frame
             yield return null;
         }
-        while (timeElapsed < moveDuration);
+        while (timeElapsed < parameters.moveDuration);
 
         // Motion has finished.
         Moving = false;

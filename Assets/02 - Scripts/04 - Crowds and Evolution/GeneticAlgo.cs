@@ -6,10 +6,6 @@ using UnityEngine.UI;
 
 public class GeneticAlgo : MonoBehaviour
 {
-
-    [Header("Genetic Algorithm parameters")]
-    public int popSize = 100;
-    public int maxAnimals = 1000;
     public GameObject animalPrefab;
 
     private List<GameObject> animals;
@@ -19,9 +15,10 @@ public class GeneticAlgo : MonoBehaviour
     protected float height;
 
     private DayNightLighting dayNightSystem;
-
+    private ParameterManager parameters;
     void Start()
     {
+        parameters = ParameterManager.Instance;
         // Retrieve terrain.
         terrain = Terrain.activeTerrain;
         customTerrain = GetComponent<CustomTerrain>();
@@ -31,7 +28,7 @@ public class GeneticAlgo : MonoBehaviour
 
         // Initialize animals array.
         animals = new List<GameObject>();
-        for (int i = 0; i < popSize; i++)
+        for (int i = 0; i < parameters.popSize; i++)
         {
             GameObject animal = makeAnimal();
             animals.Add(animal);
@@ -41,7 +38,7 @@ public class GeneticAlgo : MonoBehaviour
     void Update()
     {
         // Keeps animal to a minimum.
-        while (animals.Count < popSize)
+        while (animals.Count < parameters.popSize)
         {
             animals.Add(makeAnimal());
         }
@@ -82,7 +79,7 @@ public class GeneticAlgo : MonoBehaviour
     /// <param name="parent"></param>
     public bool addOffspring(Animal parent)
     {
-        if (animals.Count >= maxAnimals) {
+        if (animals.Count >= parameters.maxAnimals) {
             return false;
         }
         GameObject animal = makeAnimal(parent.transform.position, parent.generation + 1);

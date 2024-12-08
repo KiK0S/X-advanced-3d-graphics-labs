@@ -56,17 +56,53 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     public FootStepper backLeftFoot;
     public FootStepper backRightFoot;
 
+    public Transform targetRoot;
+
+    protected Terrain terrain;
+    public CustomTerrain cterrain;
+
     // Awake is called when the script instance is being loaded.
     void Awake()
     {
         StartCoroutine(Gait());
         TailInitialize();
         BodyInitialize();
+        terrain = Terrain.activeTerrain;
+        cterrain = terrain.GetComponent<CustomTerrain>();
+        GameObject localTargetRoot = new GameObject("local target root");
+        localTargetRoot.transform.SetParent(targetRoot);
+        frontLeftFoot = Instantiate(frontLeftFoot);
+        frontLeftFoot.transform.SetParent(localTargetRoot.transform);
+        frontRightFoot = Instantiate(frontRightFoot);
+        frontRightFoot.transform.SetParent(localTargetRoot.transform);
+        backLeftFoot = Instantiate(backLeftFoot);
+        backLeftFoot.transform.SetParent(localTargetRoot.transform);
+        backRightFoot = Instantiate(backRightFoot);
+        backRightFoot.transform.SetParent(localTargetRoot.transform);
     }
 
     // Update is called every frame, if the MonoBehaviour is enabled.
     private void Update()
     {        
+        if (goal == null || goal.position.x == 0) {
+            goal = this.GetComponent<Animal>().goal;
+        }
+
+        float width = terrain.terrainData.size.x;
+        float height = terrain.terrainData.size.z;
+        Vector3 scale = terrain.terrainData.heightmapScale;
+        Vector3 loc = transform.position;
+        if (loc.x < 0)
+            loc.x += width;
+        else if (loc.x > width)
+            loc.x -= width;
+        if (loc.z < 0)
+            loc.z += height;
+        else if (loc.z > height)
+            loc.z -= height;
+        // loc.y = cterrain.getInterp(loc.x/scale.x, loc.z/scale.z);
+        transform.position = loc;
+
         RootMotion();
     }
 
@@ -149,18 +185,11 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     private void RootAdaptation()
     {
         // Origin of the ray.
-        Vector3 raycastOrigin = groundChecker.position;
+        Vector3 checkPos = groundChecker.position;
 
-        // The ray information gives you where you hit and the normal of the terrain in that location.
-        if (Physics.Raycast(raycastOrigin, -transform.up, out RaycastHit hit, Mathf.Infinity))
-        {
-            if (hit.transform.gameObject.tag == "Ground")
-            {
-                posHit = hit.point;
-                distanceHit = hit.distance;
-                normalTerrain = hit.normal;
-            }
-        }
+        Vector3 scale = terrain.terrainData.heightmapScale;
+        float terrain_y = cterrain.getInterp(checkPos.x/scale.x, checkPos.z/scale.z);
+        Vector3 terrain_normal = cterrain.getNormal(checkPos.x/scale.x, checkPos.z/scale.z);
 
         /*
          * In this layer, we need to refine the position and rotation of the hips based on the ground. Without this part, the animal would not lift its root body when walking on high terrains.
@@ -171,8 +200,8 @@ public class QuadrupedProceduralMotion : MonoBehaviour
 
         // START TODO ###################
 
-        hips.position = new Vector3(hips.position.x, hit.point.y + 1.0f, hips.position.z);
-        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+        hips.position = new Vector3(hips.position.x, terrain_y + 1.0f, hips.position.z);
+        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, terrain_normal) * transform.rotation;
         hips.rotation = Quaternion.Slerp(hips.rotation, targetRotation, 10.0f * Time.deltaTime);
 
         // END TODO ###################
