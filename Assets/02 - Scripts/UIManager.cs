@@ -11,12 +11,16 @@ public class UIManager : MonoBehaviour
     public Button followButton;
     public Camera mainCamera;
     public Camera followingCamera;
+    public GameObject eyeVisualizerPanel;
+    public Text outputText;
     
     private Animal[] animals;
     private GeneticAlgo geneticAlgo;
     private Transform cameraOriginalTransform;
     private bool isFollowing = false;
     private Transform targetToFollow;
+    private Image[] eyeCircles;
+    private Animal selectedAnimal;
 
     void Start()
     {
@@ -75,9 +79,19 @@ public class UIManager : MonoBehaviour
 
     void OnAnimalSelected(int index)
     {
-        if (isFollowing && index >= 0 && index < animals.Length)
+        if (index >= 0 && index < animals.Length)
         {
-            targetToFollow = animals[index].transform;
+            selectedAnimal = animals[index];
+            if (isFollowing)
+            {
+                targetToFollow = selectedAnimal.transform;
+            }
+            
+            // Create eye visualizer circles if they don't exist
+            if (eyeVisualizerPanel != null && eyeCircles == null)
+            {
+                CreateEyeVisualizers(selectedAnimal.nEyes);
+            }
         }
     }
 
@@ -173,6 +187,69 @@ public class UIManager : MonoBehaviour
                 Vector3 targetPosition = targetToFollow.position;
                 followingCamera.transform.position = Vector3.Lerp(followingCamera.transform.position, targetPosition + new Vector3(0, 10, -10), Time.deltaTime * 5f);
                 followingCamera.transform.LookAt(targetToFollow);
+            }
+        }
+
+        // Update eye visualizers and output text
+        if (selectedAnimal != null && selectedAnimal.gameObject.activeInHierarchy)
+        {
+            UpdateEyeVisualizers();
+            UpdateOutputText();
+        }
+    }
+
+    private void CreateEyeVisualizers(int nEyes)
+    {
+        // Clean up existing circles if any
+        if (eyeCircles != null)
+        {
+            foreach (var circle in eyeCircles)
+            {
+                if (circle != null)
+                    Destroy(circle.gameObject);
+            }
+        }
+
+        eyeCircles = new Image[nEyes];
+        float circleSize = 20f; // Size of each circle in pixels
+        float spacing = 5f; // Spacing between circles
+
+        for (int i = 0; i < nEyes; i++)
+        {
+            GameObject circleObj = new GameObject($"EyeCircle_{i}");
+            circleObj.transform.SetParent(eyeVisualizerPanel.transform, false);
+            
+            Image circleImage = circleObj.AddComponent<Image>();
+            circleImage.rectTransform.sizeDelta = new Vector2(circleSize, circleSize);
+            circleImage.rectTransform.anchoredPosition = new Vector2(i * (circleSize + spacing), 0);
+            
+            eyeCircles[i] = circleImage;
+        }
+    }
+
+    private void UpdateEyeVisualizers()
+    {
+        if (eyeCircles == null || selectedAnimal == null) return;
+
+        var eyeInputs = selectedAnimal.GetEyeInputs();
+        for (int i = 0; i < eyeCircles.Length && i < eyeInputs.Length; i++)
+        {
+            if (eyeCircles[i] != null)
+            {
+                float value = eyeInputs[i];
+                eyeCircles[i].color = new Color(0, value, 0, 1);
+            }
+        }
+    }
+
+    private void UpdateOutputText()
+    {
+        if (outputText != null && selectedAnimal != null)
+        {
+            var outputs = selectedAnimal.GetLastOutputs();
+            if (outputs != null)
+            {
+                outputText.text = $"Outputs: Mean = {outputs[0]:F2}\n Variance: = {outputs[1]:F2}\n Speed: {outputs[2]:F2}";
             }
         }
     }

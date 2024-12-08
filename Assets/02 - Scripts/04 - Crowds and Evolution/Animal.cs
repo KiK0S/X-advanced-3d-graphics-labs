@@ -24,6 +24,7 @@ public class Animal : MonoBehaviour
 
     [Header("Energy parameters")]
     public float maxEnergy = 50.0f;
+    public float initEnergy = 100.0f;
     public float lossEnergy = 0.1f;
     public float gainEnergy = 20.0f;
     public float spawnEnergyRequired = 3.0f;
@@ -55,6 +56,7 @@ public class Animal : MonoBehaviour
     private float[] networkInput;
     private int outputs = 4;
 
+
     // Genetic alg.
     private GeneticAlgo genetic_algo = null;
 
@@ -81,7 +83,7 @@ public class Animal : MonoBehaviour
 
         MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
 
-        energy = maxEnergy / 2.0f;
+        energy = initEnergy;
         tfm = transform;
         dayNightSystem = FindObjectOfType<DayNightLighting>();
 
@@ -286,7 +288,7 @@ public class Animal : MonoBehaviour
                 foreach (int offsetX in offsetsX) {
                     foreach (int offsetY in offsetsY) {
                         if ((int)px + offsetX >= 0 && (int)px + offsetX < details.GetLength(1) && (int)py + offsetY >= 0 && (int)py + offsetY < details.GetLength(0) && details[(int)py + offsetY, (int)px + offsetX] > 0) {
-                            visionInfo[i] = 1 / distance;
+                            visionInfo[i] = 1;// or / sqrt(distance) ? // / distance;
                             found = true;
                             break;
                         }
@@ -381,5 +383,15 @@ public class Animal : MonoBehaviour
     {
         if (brain == null) return "";
         return brain.SerializeWeights();
+    }
+
+    public float[] GetEyeInputs()
+    {
+        return visionInfo;
+    }
+
+    public float[] GetLastOutputs()
+    {
+        return hiddenInfo;
     }
 }
