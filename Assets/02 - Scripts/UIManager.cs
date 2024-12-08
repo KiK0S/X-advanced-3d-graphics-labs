@@ -249,8 +249,9 @@ public class UIManager : MonoBehaviour
             var outputs = selectedAnimal.GetLastOutputs();
             if (outputs != null)
             {
-                outputText.text = $"Outputs: Mean = {outputs[0]:F2}\n Variance: = {outputs[1]:F2}\n Speed: {outputs[2]:F2}";
+                outputText.text = "Outputs: [" + string.Join(", ", Array.ConvertAll(outputs, x => $"{x:F2}")) + "]\n";
             }
+            outputText.text += $"Health: {selectedAnimal.GetHealth():F2}\n";
         }
     }
 } 
