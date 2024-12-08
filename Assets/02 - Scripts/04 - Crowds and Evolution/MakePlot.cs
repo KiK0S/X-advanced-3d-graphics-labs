@@ -51,8 +51,8 @@ public class MakePlot : MonoBehaviour
  
         for (int i = 0; i < dataPoints.Count; i++)
         {
-            float y = Mathf.Lerp(0, canvasRectTransform.rect.height, (float)dataPoints[i] / max_cnt);
-            float x = Mathf.Lerp(0, canvasRectTransform.rect.width, (float)i / (dataPoints.Count - 1));
+            float y = Mathf.Lerp(0f, canvasRectTransform.rect.height, (float)dataPoints[i] / max_cnt);
+            float x = Mathf.Lerp(0f, canvasRectTransform.rect.width, (float)i / (dataPoints.Count - 1));
             
             GameObject pointInstance = Instantiate(pointPrefab, canvasRectTransform);
 
