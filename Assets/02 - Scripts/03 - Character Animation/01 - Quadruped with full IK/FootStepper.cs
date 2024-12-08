@@ -18,14 +18,15 @@ public class FootStepper : MonoBehaviour
 
     // Flag to define when a leg is moving.
     public bool Moving;
+    public CustomTerrain terrain;
 
 
     // Awake is called when the script instance is being loaded.
     void Awake()
     {
         // We put the steppers at the top of the hierarchy, to avoid other influences from the parent transforms and to see them better.
-        transform.SetParent(null);
-
+        // transform.SetParent(null);
+        terrain = FindObjectOfType<CustomTerrain>();
         // Adapt the legs just after starting the script.
         MoveLeg();
     }
@@ -104,21 +105,11 @@ public class FootStepper : MonoBehaviour
 
         // START TODO ###################
 
-        float verticalDisplacement = 0.01f;
-        Vector3 raycastOrigin = homeTransform.position + overshootVector + new Vector3(0, verticalDisplacement, 0);
-
-        RaycastHit hit;
-        if (Physics.Raycast(raycastOrigin, Vector3.down, out hit, Mathf.Infinity))
-        {
-            endPos = hit.point;
-            endNormal = hit.normal;
-            return true;
-        } else {
-            endPos = Vector3.zero;
-            endNormal = Vector3.zero;
-            return false;
-        }
-
+        float verticalDisplacement = 0.1f;
+        endPos = homeTransform.position;
+        endPos.y = terrain.getInterp(endPos.x, endPos.z);
+        endNormal = terrain.getNormal(endPos.x, endPos.z);
+        return true;
         // END TODO ###################
     }
 

@@ -41,6 +41,11 @@ public class Animal : MonoBehaviour
     [Header("Spawning")]
     public float spawnChance = 0.1f;
 
+
+    [Header("Goal")]
+    public Transform hips = null;
+    public Transform goal = null;
+
     private int[] networkStruct;
     private SimpleNeuralNet brain = null;
 
@@ -72,6 +77,11 @@ public class Animal : MonoBehaviour
 
     public float timeOfLife = 0.0f;
     private bool isDestroyed = false;
+
+    [Header("Movement")]
+    public float maxGoalDistance = 2.0f;  // Reduced from 10 to make steps more manageable
+    public float goalUpdateRate = 0.5f;   // How often to update goal position
+    private float goalUpdateTimer = 0f;
 
     void Start()
     {
@@ -108,8 +118,10 @@ public class Animal : MonoBehaviour
         // In case something is not initialized...
         if (brain == null)
             brain = new SimpleNeuralNet(networkStruct);
-        if (terrain == null)
+        if (terrain == null) {
+            // Setup(FindObjectOfType<CustomTerrain>(), null);
             return;
+        }
         if (details == null)
         {
             UpdateSetup();
@@ -216,12 +228,21 @@ public class Animal : MonoBehaviour
         float finalAngle = meanAngle + randStdNormal * Mathf.Sqrt(variance);
         finalAngle = Mathf.Clamp(finalAngle, -maxAngle, maxAngle);
         
-        tfm.Rotate(0.0f, finalAngle, 0.0f);
 
         speed = Mathf.Lerp(minSpeed, maxSpeed, output[2] * 2.0f - 1.0f);
         
         for (int i = 0; i < output.Length; i++) {
             hiddenInfo[i] = output[i];
+        }
+
+        goalUpdateTimer += Time.deltaTime;
+        if (goalUpdateTimer >= goalUpdateRate) {
+            goalUpdateTimer = 0f;
+            
+            // Calculate new goal position
+            Vector3 targetDirection = Quaternion.Euler(0f, finalAngle, 0f) * hips.rotation * Vector3.forward;
+            
+            goal.position = hips.position + targetDirection * maxGoalDistance;
         }
     }
 
