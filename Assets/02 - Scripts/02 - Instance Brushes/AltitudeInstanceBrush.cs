@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+
 using UnityEngine;
 
 public class AltitudeInstanceBrush : InstanceBrush {
@@ -16,5 +18,6 @@ public class AltitudeInstanceBrush : InstanceBrush {
                 spawnObject(new_x, new_z);
             }
         }
+        Thread.Sleep(200);
     }   
 }

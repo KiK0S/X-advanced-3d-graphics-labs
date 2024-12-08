@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class SteepnessInstanceBrush : InstanceBrush {
@@ -16,5 +17,6 @@ public class SteepnessInstanceBrush : InstanceBrush {
                 spawnObject(new_x, new_z);
             }
         }
+        Thread.Sleep(200);
     }   
 }

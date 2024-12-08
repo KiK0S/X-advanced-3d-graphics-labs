@@ -8,7 +8,8 @@ public class RandomBrush : TerrainBrush {
         for (int zi = -radius; zi <= radius; zi++) {
             for (int xi = -radius; xi <= radius; xi++) {
                 if (!BrushKernel.kernels[kernelType].included(xi, zi, radius)) continue;
-                    terrain.set(x + xi, z + zi, Random.Range(0, height));
+                    float y = terrain.get(x + xi, z + zi);
+                    terrain.set(x + xi, z + zi, y + Random.Range(-height, height));
             }
         }
     }
