@@ -58,6 +58,7 @@ public class UIManager : MonoBehaviour
         if (animalSelector == null) return;
 
         animals = FindObjectsOfType<Animal>();
+        Array.Sort(animals, (a, b) => b.timeOfLife.CompareTo(a.timeOfLife));
         animalSelector.ClearOptions();
 
         for (int i = 0; i < animals.Length; i++)

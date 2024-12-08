@@ -51,7 +51,9 @@ public class Animal : MonoBehaviour
     private float[] visionInfo;
     private float[] geoInfo;
     private float[] dayInfo;
+    private float[] hiddenInfo;
     private float[] networkInput;
+    private int outputs = 4;
 
     // Genetic alg.
     private GeneticAlgo genetic_algo = null;
@@ -63,7 +65,7 @@ public class Animal : MonoBehaviour
 
     private float speedCoeff = 0.0f;
 
-    private float timeOfLife = 0.0f;
+    public float timeOfLife = 0.0f;
     private bool isDestroyed = false;
 
     void Start()
@@ -72,8 +74,12 @@ public class Animal : MonoBehaviour
         visionInfo = new float[nEyes];
         geoInfo = new float[3];
         dayInfo = new float[2];
+        hiddenInfo = new float[outputs + 1];
+        for (int i = 0; i < hiddenInfo.Length; i++) {
+            hiddenInfo[i] = 0.0f;
+        }
 
-        MakeNetworkInput(visionInfo, geoInfo, dayInfo);
+        MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
 
         energy = maxEnergy / 2.0f;
         tfm = transform;
@@ -112,17 +118,22 @@ public class Animal : MonoBehaviour
         energy -= lossEnergy;
         timeOfLife += Time.deltaTime;
         // If the animal is located in the dimensions of the terrain and over a grass position (details[dy, dx] > 0), it eats it, gain energy and spawn an offspring.
-        if ((dx >= 0) && dx < (details.GetLength(1)) && (dy >= 0) && (dy < details.GetLength(0)) && details[dy, dx] > 0)
-        {
-            // Eat (remove) the grass and gain energy.
-            details[dy, dx] = 0;
-            energy += gainEnergy;
-            if (energy > maxEnergy)
-                energy = maxEnergy;
-
-            if (shouldSpawn())
-                spawnOffspring();
+        int[] offsetsX = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
+        int[] offsetsY = {-1, -1, -1, 0, 0, 0, 1, 1, 1};
+        bool eated = false;
+        foreach (int offsetX in offsetsX) {
+            foreach (int offsetY in offsetsY) {
+                if ((dx + offsetX >= 0) && (dx + offsetX < details.GetLength(1)) && (dy + offsetY >= 0) && (dy + offsetY < details.GetLength(0)) && details[dy + offsetY, dx + offsetX] > 0) {
+                    details[dy + offsetY, dx + offsetX] = 0;
+                    energy += gainEnergy;
+                    if (energy > maxEnergy)
+                        energy = maxEnergy;
+                    eated = true;
+                }
+            }
         }
+        if (eated && shouldSpawn())
+            spawnOffspring();
 
         // If the energy is below 0, the animal dies.
         if (energy < 0)
@@ -152,9 +163,9 @@ public class Animal : MonoBehaviour
             
             // Create the final color: base brightness for R&B, enhanced green
             Color newColor = new Color(
-                brightness,                    // Red
-                Mathf.Clamp01(brightness + greenComponent * 0.5f),  // Green (boosted by vision)
-                brightness                     // Blue
+                brightness * 0.5f,                    // Red
+                Mathf.Clamp01(brightness * 0.5f + greenComponent * 0.5f),  // Green (boosted by vision)
+                brightness * 0.5f                     // Blue
             );
             
             // Apply to all materials
@@ -171,7 +182,7 @@ public class Animal : MonoBehaviour
 
         UpdateDay();
 
-        MakeNetworkInput(visionInfo, geoInfo, dayInfo);
+        MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
 
 
         // 2. Use brain to get mean and variance
@@ -195,6 +206,10 @@ public class Animal : MonoBehaviour
         tfm.Rotate(0.0f, finalAngle, 0.0f);
 
         speed = Mathf.Lerp(minSpeed, maxSpeed, output[2] * 2.0f - 1.0f);
+        
+        for (int i = 0; i < output.Length; i++) {
+            hiddenInfo[i] = output[i];
+        }
     }
 
     public float GetSpeed() {
@@ -245,27 +260,42 @@ public class Animal : MonoBehaviour
             visionInfo[i] = 0.0f;
             Debug.DrawRay(tfm.position, forwardAnimal * maxVision, Color.red);
 
-            // Interate over vision length.
+        // Interate over vision length.
             for (float distance = 1.0f; distance < maxVision; distance += 0.5f)
             {
                 // Position where we are looking at.
-                float px = (sx + (distance * forwardAnimal.x * ratio.x));
-                float py = (sy + (distance * forwardAnimal.z * ratio.y));
+                int px = (int)(sx + (distance * forwardAnimal.x * ratio.x));
+                int py = (int)(sy + (distance * forwardAnimal.z * ratio.y));
 
-                if (px < 0)
-                    px += detailSize.x;
-                else if (px >= detailSize.x)
-                    px -= detailSize.x;
-                if (py < 0)
-                    py += detailSize.y;
-                else if (py >= detailSize.y)
-                    py -= detailSize.y;
 
-                if ((int)px >= 0 && (int)px < details.GetLength(1) && (int)py >= 0 && (int)py < details.GetLength(0) && details[(int)py, (int)px] > 0)
-                {
-                    visionInfo[i] = 1 / distance;
+                if (px < 0 || px >= detailSize.x || py < 0 || py >= detailSize.y)
                     break;
+                
+                Vector3 pos = tfm.position + distance * forwardAnimal;
+                Vector3 norm = Vector3.Cross(forwardAnimal, Vector3.up);
+                // Debug.DrawLine(pos, pos + norm, Color.blue);
+                // int[] offsetsX = {0, 1, 0, 1};
+                // int[] offsetsY = {0, 0, 1, 1};
+                int[] offsetsX = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
+                int[] offsetsY = {-1, -1, -1, 0, 0, 0, 1, 1, 1};
+                // if (distance > 2.5) {
+                    // offsetsX = new int[] {0};
+                    // offsetsY = new int[] {0};
+                // }
+                bool found = false;
+                foreach (int offsetX in offsetsX) {
+                    foreach (int offsetY in offsetsY) {
+                        if ((int)px + offsetX >= 0 && (int)px + offsetX < details.GetLength(1) && (int)py + offsetY >= 0 && (int)py + offsetY < details.GetLength(0) && details[(int)py + offsetY, (int)px + offsetX] > 0) {
+                            visionInfo[i] = 1 / distance;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        break;
                 }
+                if (found)
+                    break;
             }
         }
     }
@@ -336,7 +366,7 @@ public class Animal : MonoBehaviour
                 inputSize += input.Length;
             }
             networkInput = new float[inputSize];
-            networkStruct = new int[] { inputSize, 3, 3 };
+            networkStruct = new int[] { inputSize, outputs };
         }
         int index = 0;
         foreach (float[] input in inputs) {

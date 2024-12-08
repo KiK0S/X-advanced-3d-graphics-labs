@@ -801,7 +801,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 4.3206e-41, y: 1.0045e-41, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0.00000004037101, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -1446,8 +1446,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58addec6626ef40dfb932e8efbbb6236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  popSize: 100
-  maxAnimals: 300
+  popSize: 30
+  maxAnimals: 80
   animalPrefab: {fileID: 6526620}
 --- !u!114 &374040441
 MonoBehaviour:
@@ -4740,6 +4740,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Human - (Autonomous)
       objectReference: {fileID: 0}
+    - target: {fileID: 3404752603996515038, guid: 6e0a91f5d1c3f4d4ca7ef92d4e643784,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3404752603996515039, guid: 6e0a91f5d1c3f4d4ca7ef92d4e643784,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e0a91f5d1c3f4d4ca7ef92d4e643784, type: 3}
 --- !u!1001 &6733265589871223679
@@ -4806,18 +4816,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
+      propertyPath: nEyes
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
       propertyPath: maxSpeed
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: swapRate
-      value: 0.3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: maxEnergy
       value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
+      propertyPath: maxVision
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
+      propertyPath: stepAngle
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
@@ -4827,12 +4852,12 @@ PrefabInstance:
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: lossEnergy
-      value: 0.1
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: mutateRate
-      value: 0.3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
@@ -4842,7 +4867,7 @@ PrefabInstance:
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
       propertyPath: mutateStrength
-      value: 0.2
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 6733265589692463592, guid: b8a4860b06bc8b44fa2e523916edd3dd,
         type: 3}
@@ -4863,6 +4888,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Animal - (Autonomous)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733265589692463594, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8a4860b06bc8b44fa2e523916edd3dd, type: 3}
