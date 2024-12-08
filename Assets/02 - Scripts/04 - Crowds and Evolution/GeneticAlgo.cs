@@ -41,7 +41,7 @@ public class GeneticAlgo : MonoBehaviour
     void Update()
     {
         // Keeps animal to a minimum.
-        while (animals.Count < popSize / 2)
+        while (animals.Count < popSize)
         {
             animals.Add(makeAnimal());
         }
