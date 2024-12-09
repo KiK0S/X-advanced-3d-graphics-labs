@@ -61,9 +61,12 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     protected Terrain terrain;
     public CustomTerrain cterrain;
     private GameObject localTargetRoot;
+    private bool started = false;
     // Awake is called when the script instance is being loaded.
     void Start()
     {
+        if (started) return;
+        started = true;
         terrain = Terrain.activeTerrain;
         cterrain = terrain.GetComponent<CustomTerrain>();
         
@@ -123,6 +126,7 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     // LateUpdate is called after all Update functions have been called.
     private void LateUpdate()
     {
+        if (!started) Start();
         TrackHead();
         TailUpdate();
         RootAdaptation();
@@ -244,6 +248,7 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     /// </summary>
     void TailUpdate()
     {
+        if (tailHomeLocalRotation == null) return;
         // Tail rotates opposite to the current angular velocity to have some inertia effect.
         tailRotation.Step(-currentAngularVelocity / turnSpeed * tailTurnMultiplier, tailTurnSpeed);
 
