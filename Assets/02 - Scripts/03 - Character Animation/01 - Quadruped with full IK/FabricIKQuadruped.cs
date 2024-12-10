@@ -43,6 +43,8 @@ public class FabricIKQuadruped : MonoBehaviour
     // Extra: Strength of going back to the start position.
     [Range(0, 1f)]
     public float snapBackStrength = 1f;
+    private float startScale;
+    private float currentScale;
 
     // Awake is called when the script instance is being loaded.
     private void Awake()
@@ -117,6 +119,8 @@ public class FabricIKQuadruped : MonoBehaviour
             }
             current = current.parent;
         }
+
+        startScale = transform.parent.parent.localScale.x;
     }
 
     // LateUpdate is called after all Update functions have been called.
@@ -173,6 +177,9 @@ public class FabricIKQuadruped : MonoBehaviour
 
         // START TODO ###################
 
+        currentScale = transform.parent.parent.localScale.x;
+        float scaleCoef = currentScale / startScale;
+
         // Change condition!
         if (completeLength < Vector3.Magnitude(target.position - bones[0].position))
         {
@@ -180,7 +187,7 @@ public class FabricIKQuadruped : MonoBehaviour
             bonesPositions[0] = bones[0].position;
             for (int j = 1; j < bones.Length; j++)
             {
-                bonesPositions[j] = bonesPositions[j - 1] + directionToTarget * bonesLength[j - 1];
+                bonesPositions[j] = bonesPositions[j - 1] + directionToTarget * bonesLength[j - 1] * scaleCoef;
             }
 
             // END TODO ###################
@@ -239,7 +246,7 @@ public class FabricIKQuadruped : MonoBehaviour
                         bonesPositions[i] = target.position;
                     else {
                         Vector3 direction = (bonesPositions[i] - bonesPositions[i + 1]).normalized;   
-                        bonesPositions[i] = bonesPositions[i + 1] + direction * bonesLength[i - 1];
+                        bonesPositions[i] = bonesPositions[i + 1] + direction * bonesLength[i - 1] * scaleCoef;
                     }
 
                     // END TODO ###################
@@ -255,7 +262,7 @@ public class FabricIKQuadruped : MonoBehaviour
                     // START TODO ###################
 
                     Vector3 direction = (bonesPositions[i] - bonesPositions[i - 1]).normalized;   
-                    bonesPositions[i] = bonesPositions[i - 1] + direction * bonesLength[i - 1];
+                    bonesPositions[i] = bonesPositions[i - 1] + direction * bonesLength[i - 1] * scaleCoef;
 
                     // END TODO ###################
 
