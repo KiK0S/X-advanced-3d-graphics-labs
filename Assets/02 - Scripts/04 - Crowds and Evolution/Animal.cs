@@ -155,7 +155,7 @@ public class Animal : MonoBehaviour
         }
 
         // Update the color of all materials based on energy and vision
-        if (false && mats != null && mats.Length > 0)
+        if (mats != null && mats.Length > 0)
         {
             // Calculate the base brightness from energy
             float brightness = energy / parameters.maxEnergy;
@@ -314,7 +314,7 @@ public class Animal : MonoBehaviour
                 foreach (int offsetX in offsetsX) {
                     foreach (int offsetY in offsetsY) {
                         if ((int)px + offsetX >= 0 && (int)px + offsetX < details.GetLength(1) && (int)py + offsetY >= 0 && (int)py + offsetY < details.GetLength(0) && details[(int)py + offsetY, (int)px + offsetX] > 0) {
-                            visionInfo[i] = 1;// or / sqrt(distance) ? // / distance;
+                            visionInfo[i] = 0.5f + 1.0f / distance;
                             found = true;
                             break;
                         }
