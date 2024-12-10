@@ -53,6 +53,10 @@ public class Animal : MonoBehaviour
 
     private float goalUpdateTimer = 0f;
 
+    public Vector3 minScale = new Vector3(0.33f, 0.33f, 0.33f);
+    public Vector3 maxScale = new Vector3(1f, 1f, 1f);
+    public float ageAdult = 15f;
+
     void Start()
     {
         parameters = ParameterManager.Instance;
@@ -83,6 +87,8 @@ public class Animal : MonoBehaviour
             materialsList.AddRange(renderer.materials);
         }
         mats = materialsList.ToArray();
+
+        tfm.localScale = minScale;
     }
 
     void Update()
@@ -173,6 +179,10 @@ public class Animal : MonoBehaviour
                 mat.color = newColor;
             }
         }
+
+        // Change size of animal based on its age
+        float ageFactor = Mathf.Clamp(timeOfLife, 0f, ageAdult) / ageAdult;
+        tfm.localScale = Vector3.Lerp(minScale, maxScale, ageFactor);
 
         // 1. Update receptor.
         UpdateVision();
