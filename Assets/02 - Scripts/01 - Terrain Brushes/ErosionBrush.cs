@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ErosionBrush : TerrainBrush {
     public float erosionHeight = 0.1f;
@@ -48,8 +49,9 @@ public class ErosionBrush : TerrainBrush {
                 }
 
 
-                foreach (Vector2Int point in path) {
-                    buffer[point.x - x + radius, point.y - z + radius]++;
+                for (int i = 0; i < path.Count; i++) {
+                    Vector2Int point = path[i];
+                    buffer[point.x - x + radius, point.y - z + radius] += terrain.get(point.x, point.y) - terrain.get(path.Last().x, path.Last().y); // * (path.Count - i);
                 }
             }
         }
@@ -57,7 +59,7 @@ public class ErosionBrush : TerrainBrush {
         for (int zi = -radius; zi <= radius; zi++) {
             for (int xi = -radius; xi <= radius; xi++) {
                 if (buffer[xi + radius, zi + radius] > delta) {
-                    terrain.set(x + xi, z + zi, terrain.get(x + xi, z + zi) - erosionHeight);
+                    terrain.set(x + xi, z + zi, terrain.get(x + xi, z + zi) - erosionHeight * buffer[xi + radius, zi + radius]);
                 }
             }
         }
