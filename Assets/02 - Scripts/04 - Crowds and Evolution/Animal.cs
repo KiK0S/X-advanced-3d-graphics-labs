@@ -35,7 +35,7 @@ public class Animal : MonoBehaviour
     private float[] dayInfo;
     private float[] hiddenInfo;
     private float[] networkInput;
-    private int outputs = 4;
+    private int outputs = 3;
 
     private static ParameterManager parameters;
     // Genetic alg.
@@ -73,7 +73,7 @@ public class Animal : MonoBehaviour
             hiddenInfo[i] = 0.0f;
         }
 
-        MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
+        MakeNetworkInput(visionInfo, /*geoInfo, dayInfo,*/ hiddenInfo);
 
         energy = parameters.initEnergy;
         waterEnergy = parameters.maxWaterEnergy;
@@ -194,7 +194,7 @@ public class Animal : MonoBehaviour
 
         UpdateDay();
 
-        MakeNetworkInput(visionInfo, geoInfo, dayInfo, hiddenInfo);
+        MakeNetworkInput(visionInfo, /*geoInfo, dayInfo,*/ hiddenInfo);
 
 
         // 2. Use brain to get mean and variance
@@ -390,7 +390,7 @@ public class Animal : MonoBehaviour
                 inputSize += input.Length;
             }
             networkInput = new float[inputSize];
-            networkStruct = new int[] { inputSize, outputs };
+            networkStruct = new int[] { inputSize, 3, outputs + 1 };
         }
         int index = 0;
         foreach (float[] input in inputs) {
@@ -418,5 +418,10 @@ public class Animal : MonoBehaviour
     }
     public static int GetEyes() {
         return parameters.nEyes;
+    }
+
+    public List<float[]> GetAllLayerValues()
+    {
+        return brain.GetAllLayerValues();
     }
 }

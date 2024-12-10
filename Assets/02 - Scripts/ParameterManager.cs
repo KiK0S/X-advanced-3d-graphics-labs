@@ -51,6 +51,12 @@ public class ParameterManager : MonoBehaviour
     public float goalUpdateRate = 0.5f;   // How often to update goal position
 
 
+    public enum ActivationFunction { Sigmoid, ReLU }
+    [Header("Neural Network Parameters")]
+    public ActivationFunction activationFunction = ActivationFunction.ReLU;
+    public float meanInitialWeight = 0.5f;
+    public float stdInitialWeight = 0.2f;
+
     [Header("Foot Stepper Parameters")]
     public float distanceThreshold = 0.4f;
     public float angleThreshold = 135f;

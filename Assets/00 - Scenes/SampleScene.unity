@@ -795,7 +795,8 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 7.6e-43, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 2.4810396e+27, y: 7.1518455e+22, z: 1.6634185e+22,
+    w: 1.6632139e+22}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -6866,7 +6867,7 @@ GameObject:
   - component: {fileID: 736563369}
   - component: {fileID: 736563368}
   m_Layer: 0
-  m_Name: ExportButton
+  m_Name: UI Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6892,6 +6893,9 @@ MonoBehaviour:
   followingCamera: {fileID: 1761332335}
   eyeVisualizerPanel: {fileID: 1476912369}
   outputText: {fileID: 1404331247}
+  nodeSize: 10
+  horizontalSpacing: 50
+  verticalSpacing: 15
 --- !u!4 &736563369
 Transform:
   m_ObjectHideFlags: 0
@@ -8324,8 +8328,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -400, y: -150}
-  m_SizeDelta: {x: 160, y: 100}
+  m_AnchoredPosition: {x: -250, y: -300}
+  m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1446540059
 PrefabInstance:
@@ -8498,7 +8502,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -400, y: -200}
+  m_AnchoredPosition: {x: -450, y: -120}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &1527593555 stripped
@@ -9460,8 +9464,8 @@ MonoBehaviour:
   moveDuration: 0.125
   stepOvershootFraction: 0.75
   heightOffset: 0.1
-  popSize: 30
-  maxAnimals: 1000
+  popSize: 10
+  maxAnimals: 100
 --- !u!4 &1929849645
 Transform:
   m_ObjectHideFlags: 0

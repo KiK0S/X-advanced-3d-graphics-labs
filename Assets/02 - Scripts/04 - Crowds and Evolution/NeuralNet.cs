@@ -18,6 +18,9 @@ public class SimpleNeuralNet
         for (int i = 0; i < other.allWeights.Count; i++)
         {
             allWeights.Add((float[,])other.allWeights[i].Clone());
+        }
+        for (int i = 0; i < other.allResults.Count; i++)
+        {
             allResults.Add((float[])other.allResults[i].Clone());
         }
     }
@@ -26,6 +29,8 @@ public class SimpleNeuralNet
     {
         allWeights = new List<float[,]>();
         allResults = new List<float[]>();
+        
+        allResults.Add(new float[structure[0]]);
 
         for (int i = 1; i < structure.Length; i++)
         {
@@ -43,7 +48,7 @@ public class SimpleNeuralNet
         float u2 = UnityEngine.Random.value;
         
         // Using standard normal distribution (mean = 0, std = 1)
-        float randStdNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
+        float randStdNormal = ParameterManager.Instance.stdInitialWeight * Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2) + ParameterManager.Instance.meanInitialWeight;
         
         // Scale the weights - using Xavier initialization
         // The 0.1f factor helps prevent initial saturation of neurons
@@ -67,13 +72,12 @@ public class SimpleNeuralNet
 
     public float[] getOutput(float[] input)
     {
+        allResults[0] = (float[])input.Clone();
         for (int idxLayer = 0; idxLayer < allWeights.Count; idxLayer++)
         {
             float[,] weights = allWeights[idxLayer];
-            float[] ins = input;
-            float[] outs = allResults[idxLayer];
-            if (idxLayer > 0)
-                ins = allResults[idxLayer - 1];
+            float[] ins = allResults[idxLayer];
+            float[] outs = allResults[idxLayer + 1];
 
             for (int idxNeuron = 0; idxNeuron < outs.Length; idxNeuron++)
             {
@@ -82,15 +86,27 @@ public class SimpleNeuralNet
                 {
                     sum += ins[input_i] * weights[input_i + 1, idxNeuron];
                 }
-                outs[idxNeuron] = transferFunction(sum); // Apply transfer function
+                outs[idxNeuron] = transferFunction(sum, idxLayer); // Apply transfer function
             }
         }
         return allResults[allResults.Count - 1]; // Return final result
     }
 
-    private float transferFunction(float value)
+    private float sigmoid(float value)
     {
         return 1.0f / (1.0f + Mathf.Exp(-value));
+    }
+
+    private float transferFunction(float value, int idxLayer)
+    {
+        if (idxLayer + 2 == allResults.Count)
+            return sigmoid(value);
+        if (ParameterManager.Instance.activationFunction == ParameterManager.ActivationFunction.Sigmoid)
+            return sigmoid(value);
+        else if (ParameterManager.Instance.activationFunction == ParameterManager.ActivationFunction.ReLU)
+            return Mathf.Max(0, value);
+        else
+            return value;
     }
 
     // Randomly change network weights
@@ -139,5 +155,35 @@ public class SimpleNeuralNet
         }
         json += "]}";
         return json;
+    }
+
+    public int[] GetStructure()
+    {
+        int[] structure = new int[allResults.Count];
+        for (int i = 0; i < allResults.Count; i++)
+        {
+            structure[i] = allResults[i].Length;
+        }
+        
+        return structure;
+    }
+
+    public int GetOutputSize()
+    {
+        return allResults[allResults.Count - 1].Length;
+    }
+
+    public List<float[]> GetAllLayerValues()
+    {
+        List<float[]> values = new List<float[]>();
+        foreach (var results in allResults)
+        {
+            values.Add((float[])results.Clone());
+        }
+        return values;
+    }
+    public List<float[,]> GetWeights()
+    {
+        return allWeights;
     }
 }

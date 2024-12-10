@@ -106,7 +106,7 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     // Update is called every frame, if the MonoBehaviour is enabled.
     private void Update()
     {
-        if (!started) {
+        if (!started || cterrain == null) {
             Start();
             return;
         }
@@ -348,4 +348,12 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     }
 
     #endregion
+
+    private void OnDestroy()
+    {
+        if (localTargetRoot != null)
+        {
+            Destroy(localTargetRoot);
+        }
+    }
 }

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
@@ -19,7 +20,11 @@ public class UIManager : MonoBehaviour
     private Transform cameraOriginalTransform;
     private bool isFollowing = false;
     private Transform targetToFollow;
-    private Image[] eyeCircles;
+    private List<Image[]> networkLayers;
+    private List<List<LineRenderer>> networkConnections;
+    public float nodeSize = 10f;
+    public float horizontalSpacing = 100f;
+    public float verticalSpacing = 15f;
     private Animal selectedAnimal;
 
     void Start()
@@ -55,9 +60,9 @@ public class UIManager : MonoBehaviour
         {
             followButton.onClick.AddListener(ToggleFollowSelected);
         }
-        if (eyeVisualizerPanel != null && eyeCircles == null)
+        if (eyeVisualizerPanel != null && networkLayers == null && selectedAnimal != null)
         {
-            CreateEyeVisualizers(Animal.GetEyes());
+            CreateNetworkVisualizer(selectedAnimal.GetBrain());
         }
     }
 
@@ -90,10 +95,10 @@ public class UIManager : MonoBehaviour
                 targetToFollow = selectedAnimal.transform;
             }
             
-            // Create eye visualizer circles if they don't exist
-            if (eyeVisualizerPanel != null && eyeCircles == null)
+            // Create network visualizer if it doesn't exist
+            if (eyeVisualizerPanel != null && networkLayers == null)
             {
-                CreateEyeVisualizers(Animal.GetEyes());
+                CreateNetworkVisualizer(selectedAnimal.GetBrain());
             }
         }
     }
@@ -193,54 +198,166 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Update eye visualizers and output text
+        // Update network visualizer and output text
         if (selectedAnimal != null && selectedAnimal.gameObject.activeInHierarchy)
         {
-            UpdateEyeVisualizers();
+            UpdateNetworkVisualizer();
+            // UpdateNetworkConnections();
             UpdateOutputText();
         }
     }
 
-    private void CreateEyeVisualizers(int nEyes)
+    private void CreateNetworkVisualizer(SimpleNeuralNet brain)
     {
-        // Clean up existing circles if any
-        if (eyeCircles != null)
+        // Clean up existing visualizer
+        if (networkLayers != null)
         {
-            foreach (var circle in eyeCircles)
+            foreach (var layer in networkLayers)
             {
-                if (circle != null)
-                    Destroy(circle.gameObject);
+                foreach (var node in layer)
+                {
+                    if (node != null)
+                        Destroy(node.gameObject);
+                }
             }
         }
 
-        eyeCircles = new Image[nEyes];
-        float circleSize = 20f; // Size of each circle in pixels
-        float spacing = 5f; // Spacing between circles
-
-        for (int i = 0; i < nEyes; i++)
+        if (networkConnections != null)
         {
-            GameObject circleObj = new GameObject($"EyeCircle_{i}");
-            circleObj.transform.SetParent(eyeVisualizerPanel.transform, false);
+            foreach (var layerConnections in networkConnections)
+            {
+                foreach (var line in layerConnections)
+                {
+                    if (line != null)
+                        Destroy(line.gameObject);
+                }
+            }
+        }
+
+        networkLayers = new List<Image[]>();
+        networkConnections = new List<List<LineRenderer>>();
+        
+        int[] structure = brain.GetStructure();
+        float startX = -((structure.Length - 1) * horizontalSpacing) / 2f;
+        
+        // Create nodes for each layer
+        for (int layerIdx = 0; layerIdx < structure.Length; layerIdx++)
+        {
+            int nodeCount = structure[layerIdx];
+            Image[] layerNodes = new Image[nodeCount];
+            float startY = -(nodeCount * verticalSpacing) / 2f;
+
+            for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++)
+            {
+                GameObject nodeObj = new GameObject($"Node_L{layerIdx}_N{nodeIdx}");
+                nodeObj.transform.SetParent(eyeVisualizerPanel.transform, false);
+                
+                Image nodeImage = nodeObj.AddComponent<Image>();
+                nodeImage.rectTransform.sizeDelta = new Vector2(nodeSize, nodeSize);
+                nodeImage.rectTransform.anchoredPosition = new Vector2(
+                    startX + (layerIdx * horizontalSpacing),
+                    startY + (nodeIdx * verticalSpacing)
+                );
+                
+                layerNodes[nodeIdx] = nodeImage;
+            }
             
-            Image circleImage = circleObj.AddComponent<Image>();
-            circleImage.rectTransform.sizeDelta = new Vector2(circleSize, circleSize);
-            circleImage.rectTransform.anchoredPosition = new Vector2(i * (circleSize + spacing), 0);
-            
-            eyeCircles[i] = circleImage;
+            networkLayers.Add(layerNodes);
+
+            // // Create connections to previous layer
+            // if (layerIdx > 0)
+            // {
+            //     List<LineRenderer> layerConnections = new List<LineRenderer>();
+            //     Image[] prevLayer = networkLayers[layerIdx - 1];
+            //     Image[] currentLayer = networkLayers[layerIdx];
+
+            //     for (int prevIdx = 0; prevIdx < prevLayer.Length; prevIdx++)
+            //     {
+            //         for (int currIdx = 0; currIdx < currentLayer.Length; currIdx++)
+            //         {
+            //             GameObject lineObj = new GameObject($"Connection_L{layerIdx-1}_{prevIdx}_to_L{layerIdx}_{currIdx}");
+            //             lineObj.transform.SetParent(eyeVisualizerPanel.transform, false);
+                        
+            //             LineRenderer line = lineObj.AddComponent<LineRenderer>();
+            //             line.sortingOrder = 1;
+            //             line.positionCount = 2;
+            //             line.startWidth = 0.5f;
+            //             line.endWidth = 0.5f;
+            //             line.material = new Material(Shader.Find("Sprites/Default"));
+                        
+            //             layerConnections.Add(line);
+            //         }
+            //     }
+            //     networkConnections.Add(layerConnections);
+            // }
         }
     }
 
-    private void UpdateEyeVisualizers()
+    private void UpdateNetworkVisualizer()
     {
-        if (eyeCircles == null || selectedAnimal == null) return;
+        if (networkLayers == null || selectedAnimal == null) return;
 
-        var eyeInputs = selectedAnimal.GetEyeInputs();
-        for (int i = 0; i < eyeCircles.Length && i < eyeInputs.Length; i++)
+        // Get all layer values from the brain
+        var layerValues = selectedAnimal.GetAllLayerValues();
+        
+        // Debug.Log(layerValues);
+
+        // Update node colors based on activation values
+        for (int layerIdx = 0; layerIdx < networkLayers.Count && layerIdx < layerValues.Count; layerIdx++)
         {
-            if (eyeCircles[i] != null)
+            var layer = networkLayers[layerIdx];
+            var values = layerValues[layerIdx];
+            
+            for (int nodeIdx = 0; nodeIdx < layer.Length && nodeIdx < values.Length; nodeIdx++)
             {
-                float value = eyeInputs[i];
-                eyeCircles[i].color = new Color(0, value, 0, 1);
+                float value = values[nodeIdx];
+                // Use a gradient from black (0) to green (1)
+                layer[nodeIdx].color = new Color(0, value, 0, 1);
+            }
+        }
+    }
+
+    private void UpdateNetworkConnections()
+    {
+        if (networkConnections == null || selectedAnimal == null) return;
+
+        var weights = selectedAnimal.GetBrain().GetWeights();
+        
+        for (int layerIdx = 0; layerIdx < networkConnections.Count; layerIdx++)
+        {
+            var connections = networkConnections[layerIdx];
+            var layerWeights = weights[layerIdx];
+            var prevLayer = networkLayers[layerIdx];
+            var currentLayer = networkLayers[layerIdx + 1];
+            int connectionIdx = 0;
+
+            for (int prevIdx = 0; prevIdx < prevLayer.Length; prevIdx++)
+            {
+                for (int currIdx = 0; currIdx < currentLayer.Length; currIdx++)
+                {
+                    var line = connections[connectionIdx];
+                    float weight = layerWeights[prevIdx + 1, currIdx]; // +1 to skip bias
+
+                    // Set line positions
+                    Vector3 startPos = prevLayer[prevIdx].transform.position;
+                    Vector3 endPos = currentLayer[currIdx].transform.position;
+                    line.SetPosition(0, startPos);
+                    line.SetPosition(1, endPos);
+
+                    // Set line color and width based on weight
+                    float absWeight = Mathf.Abs(weight);
+                    line.startWidth = 0.1f;
+                    line.endWidth = 0.1f;
+                    
+                    // Green for positive weights, red for negative
+                    Color lineColor = weight > 0 ? 
+                        new Color(0, absWeight, 0, 1) : 
+                        new Color(absWeight, 0, 0, 1);
+                    line.startColor = lineColor;
+                    line.endColor = lineColor;
+
+                    connectionIdx++;
+                }
             }
         }
     }
