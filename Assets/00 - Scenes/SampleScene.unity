@@ -3177,6 +3177,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Quadruped - (Procedural)
       objectReference: {fileID: 0}
+    - target: {fileID: 8107060311548940698, guid: 292e0cc1c13240549bc0ea73726cca30,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8107060311548940699, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
       propertyPath: goal

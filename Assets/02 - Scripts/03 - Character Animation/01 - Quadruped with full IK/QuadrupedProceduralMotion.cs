@@ -62,16 +62,14 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     public CustomTerrain cterrain;
     private GameObject localTargetRoot;
     private bool started = false;
+    private bool startInProgress = false;
     // Awake is called when the script instance is being loaded.
-    void Start()
+    public void Start()
     {
-        if (started) return;
-        started = true;
+        if (started || startInProgress) return;
+        startInProgress = true;
         terrain = Terrain.activeTerrain;
         cterrain = terrain.GetComponent<CustomTerrain>();
-        
-        localTargetRoot = new GameObject("local target root");
-        localTargetRoot.transform.SetParent(targetRoot);
 
         StartCoroutine(DelayedSetup());
     }
@@ -80,7 +78,13 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     {
         // Wait for a frame to ensure all components are initialized
         yield return null;
-        
+
+
+        goal = this.GetComponent<Animal>().goal;
+
+        localTargetRoot = new GameObject("local target root");
+        localTargetRoot.transform.SetParent(targetRoot);
+
         // Set target roots
         frontLeftFoot.targetRoot = localTargetRoot.transform;
         frontRightFoot.targetRoot = localTargetRoot.transform;
@@ -88,21 +92,23 @@ public class QuadrupedProceduralMotion : MonoBehaviour
         backRightFoot.targetRoot = localTargetRoot.transform;
         
         // Setup feet
-        frontLeftFoot.Setup();
-        frontRightFoot.Setup();
-        backLeftFoot.Setup();
-        backRightFoot.Setup();
+        frontLeftFoot.Setup(gameObject.GetInstanceID());
+        frontRightFoot.Setup(gameObject.GetInstanceID());
+        backLeftFoot.Setup(gameObject.GetInstanceID());
+        backRightFoot.Setup(gameObject.GetInstanceID());
         
         StartCoroutine(Gait());
         TailInitialize();
         BodyInitialize();
+        started = true;
     }
 
     // Update is called every frame, if the MonoBehaviour is enabled.
     private void Update()
-    {        
-        if (goal == null) {
-            goal = this.GetComponent<Animal>().goal;
+    {
+        if (!started) {
+            Start();
+            return;
         }
 
         float width = terrain.terrainData.size.x;
@@ -126,7 +132,10 @@ public class QuadrupedProceduralMotion : MonoBehaviour
     // LateUpdate is called after all Update functions have been called.
     private void LateUpdate()
     {
-        if (!started) Start();
+        if (!started) {
+            Start();
+            return;
+        }
         TrackHead();
         TailUpdate();
         RootAdaptation();

@@ -55,6 +55,10 @@ public class UIManager : MonoBehaviour
         {
             followButton.onClick.AddListener(ToggleFollowSelected);
         }
+        if (eyeVisualizerPanel != null && eyeCircles == null)
+        {
+            CreateEyeVisualizers(Animal.GetEyes());
+        }
     }
 
     public void UpdateAnimalList()
@@ -73,7 +77,6 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        
         animalSelector.RefreshShownValue();
     }
 
@@ -90,7 +93,7 @@ public class UIManager : MonoBehaviour
             // Create eye visualizer circles if they don't exist
             if (eyeVisualizerPanel != null && eyeCircles == null)
             {
-                CreateEyeVisualizers(selectedAnimal.GetEyes());
+                CreateEyeVisualizers(Animal.GetEyes());
             }
         }
     }

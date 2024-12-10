@@ -21,8 +21,12 @@ public class FootStepper : MonoBehaviour
     // }
 
     // Awake is called when the script instance is being loaded.
-    public void Setup()
+    public void Setup(int toLog)
     {
+        if (targetRoot == null) {
+            Debug.LogWarning($"TargetRoot is null for animal {toLog}.");
+            return;
+        }
         parameters = ParameterManager.Instance;
         terrain = Terrain.activeTerrain;
         cterrain = terrain.GetComponent<CustomTerrain>();
@@ -44,7 +48,9 @@ public class FootStepper : MonoBehaviour
         }
 
         if (parameters == null) {
-            Setup();
+            Debug.Log("Can't move leg");
+            return;
+            // Setup();
         }
 
         /*

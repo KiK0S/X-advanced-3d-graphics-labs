@@ -37,7 +37,7 @@ public class Animal : MonoBehaviour
     private float[] networkInput;
     private int outputs = 4;
 
-    private ParameterManager parameters;
+    private static ParameterManager parameters;
     // Genetic alg.
     private GeneticAlgo genetic_algo = null;
 
@@ -400,7 +400,7 @@ public class Animal : MonoBehaviour
     {
         return hiddenInfo;
     }
-    public int GetEyes() {
+    public static int GetEyes() {
         return parameters.nEyes;
     }
 }

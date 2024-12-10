@@ -18,6 +18,7 @@ public class GeneticAlgo : MonoBehaviour
     private ParameterManager parameters;
     void Start()
     {
+        animalPrefab.SetActive(false);
         parameters = ParameterManager.Instance;
         // Retrieve terrain.
         terrain = Terrain.activeTerrain;
@@ -53,7 +54,14 @@ public class GeneticAlgo : MonoBehaviour
     public GameObject makeAnimal(Vector3 position, int generation = 0)
     {
         GameObject animal = Instantiate(animalPrefab, transform);
+        animal.SetActive(true);
         animal.GetComponent<Animal>().Setup(customTerrain, this);
+        animal.GetComponent<QuadrupedProceduralMotion>().Start();
+        if (animal.GetComponent<QuadrupedProceduralMotion>().targetRoot == null)
+        {
+            Debug.LogWarning($"TargetRoot is null for animal {animal.GetInstanceID()}. Check inspector assignment.");
+        }
+
         animal.transform.position = position;
         animal.transform.Rotate(0.0f, UnityEngine.Random.value * 360.0f, 0.0f);
         animal.GetComponent<Animal>().generation = generation;
