@@ -795,8 +795,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 2.4810396e+27, y: 7.1518455e+22, z: 1.6634185e+22,
-    w: 1.6632139e+22}
+  m_BoundingSphereOverride: {x: 3.1419e-41, y: -5.0634583e+22, z: 3.1419e-41, w: 9.403955e-38}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -7891,12 +7890,12 @@ PrefabInstance:
     - target: {fileID: 2954251903923410748, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
       propertyPath: m_RotationOffsets.Array.data[0].x
-      value: 3.0129883
+      value: 3.0129874
       objectReference: {fileID: 0}
     - target: {fileID: 2954251903923410748, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
       propertyPath: m_RotationOffsets.Array.data[0].z
-      value: -5.2307153
+      value: -5.230716
       objectReference: {fileID: 0}
     - target: {fileID: 2954251903923410748, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
@@ -7916,17 +7915,17 @@ PrefabInstance:
     - target: {fileID: 2954251904142021965, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
       propertyPath: m_RotationOffsets.Array.data[0].x
-      value: 3.012983
+      value: 3.0129821
       objectReference: {fileID: 0}
     - target: {fileID: 2954251904142021965, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
       propertyPath: m_RotationOffsets.Array.data[0].y
-      value: 60.137638
+      value: 60.137646
       objectReference: {fileID: 0}
     - target: {fileID: 2954251904142021965, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
       propertyPath: m_RotationOffsets.Array.data[0].z
-      value: 5.230717
+      value: 5.2307177
       objectReference: {fileID: 0}
     - target: {fileID: 2954251904142021965, guid: 292e0cc1c13240549bc0ea73726cca30,
         type: 3}
@@ -8247,7 +8246,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1329280168}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9aef58e026548194f87c62d460fe71d6, type: 3}
+  m_Script: {fileID: 11500000, guid: ca683257a6b291880ae17fde919704d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   reproductionEffectPrefab: {fileID: 290468606}
@@ -9437,9 +9436,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aa60e09aa2ee3d4ca34e99cb69b33b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swapRate: 0.05
-  mutateRate: 0.05
-  mutateStrength: 0.5
+  swapRate: 0.2
+  mutateRate: 0.2
+  mutateStrength: 0.9
   mutateDecay: 0.9
   maxAngle: 10
   minVariance: 0.1
@@ -9458,13 +9457,16 @@ MonoBehaviour:
   nEyes: 5
   spawnChance: 0.1
   maxGoalDistance: 10
-  goalUpdateRate: 0
+  goalUpdateRate: 0.3
+  activationFunction: 0
+  meanInitialWeight: 0.5
+  stdInitialWeight: 5
   distanceThreshold: 0.4
   angleThreshold: 135
   moveDuration: 0.125
   stepOvershootFraction: 0.75
   heightOffset: 0.1
-  popSize: 10
+  popSize: 30
   maxAnimals: 100
 --- !u!4 &1929849645
 Transform:

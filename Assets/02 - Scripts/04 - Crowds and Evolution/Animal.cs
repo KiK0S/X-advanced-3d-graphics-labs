@@ -35,6 +35,7 @@ public class Animal : MonoBehaviour
     private float[] dayInfo;
     private float[] hiddenInfo;
     private float[] networkInput;
+    private float[] output;
     private int outputs = 3;
 
     private static ParameterManager parameters;
@@ -68,7 +69,7 @@ public class Animal : MonoBehaviour
         visionInfo = new float[parameters.nEyes];
         geoInfo = new float[3];
         dayInfo = new float[2];
-        hiddenInfo = new float[outputs + 1];
+        hiddenInfo = new float[1];
         for (int i = 0; i < hiddenInfo.Length; i++) {
             hiddenInfo[i] = 0.0f;
         }
@@ -198,7 +199,7 @@ public class Animal : MonoBehaviour
 
 
         // 2. Use brain to get mean and variance
-        float[] output = brain.getOutput(networkInput);
+        output = brain.getOutput(networkInput);
         
         // Mean angle from first output (mapped from [0,1] to [-maxAngle, maxAngle])
         float meanAngle = (output[0] * 2.0f - 1.0f) * parameters.maxAngle;
@@ -215,18 +216,16 @@ public class Animal : MonoBehaviour
         float finalAngle = meanAngle + randStdNormal * Mathf.Sqrt(variance);
         finalAngle = Mathf.Clamp(finalAngle, -parameters.maxAngle, parameters.maxAngle);
         
-        speed = Mathf.Lerp(parameters.minSpeed, parameters.maxSpeed, output[2] * 2.0f - 1.0f);
+        speed = Mathf.Lerp(parameters.minSpeed, parameters.maxSpeed, output[2]);
         
-        for (int i = 0; i < output.Length; i++) {
-            hiddenInfo[i] = output[i];
-        }
+        hiddenInfo[0] = output[3];
 
         goalUpdateTimer += Time.deltaTime;
         if (goalUpdateTimer >= parameters.goalUpdateRate) {
             goalUpdateTimer = 0f;
             
             // Calculate new goal position
-            Vector3 targetDirection = Quaternion.Euler(0f, finalAngle, 0f) * hips.rotation * Vector3.forward;
+            Vector3 targetDirection = speed * (Quaternion.Euler(0f, finalAngle, 0f) * hips.rotation * Vector3.forward);
             
             goal.position = tfm.position + targetDirection.normalized * parameters.maxGoalDistance;
         }
@@ -390,7 +389,7 @@ public class Animal : MonoBehaviour
                 inputSize += input.Length;
             }
             networkInput = new float[inputSize];
-            networkStruct = new int[] { inputSize, 3, outputs + 1 };
+            networkStruct = new int[] { inputSize, outputs + 1 };
         }
         int index = 0;
         foreach (float[] input in inputs) {
@@ -414,7 +413,7 @@ public class Animal : MonoBehaviour
 
     public float[] GetLastOutputs()
     {
-        return hiddenInfo;
+        return output;
     }
     public static int GetEyes() {
         return parameters.nEyes;
