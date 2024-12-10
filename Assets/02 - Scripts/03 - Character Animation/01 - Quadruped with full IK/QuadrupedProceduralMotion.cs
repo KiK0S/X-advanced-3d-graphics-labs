@@ -123,7 +123,7 @@ public class QuadrupedProceduralMotion : MonoBehaviour
             loc.z += height;
         else if (loc.z > height)
             loc.z -= height;
-        // loc.y = cterrain.getInterp(loc.x/scale.x, loc.z/scale.z);
+        loc.y = cterrain.getInterp(loc.x/scale.x, loc.z/scale.z);
         transform.position = loc;
 
         RootMotion();

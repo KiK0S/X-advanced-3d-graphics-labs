@@ -56,6 +56,7 @@ public class Animal : MonoBehaviour
     public Vector3 minScale = new Vector3(0.33f, 0.33f, 0.33f);
     public Vector3 maxScale = new Vector3(1f, 1f, 1f);
     public float ageAdult = 15f;
+    ReproductionEffectSpawner effectSpawner;
 
     void Start()
     {
@@ -89,6 +90,8 @@ public class Animal : MonoBehaviour
         mats = materialsList.ToArray();
 
         tfm.localScale = minScale;
+
+        effectSpawner = FindObjectOfType<ReproductionEffectSpawner>();
     }
 
     void Update()
@@ -257,6 +260,9 @@ public class Animal : MonoBehaviour
     private void spawnOffspring() {
         if (genetic_algo.addOffspring(this)) {
             energy -= parameters.spawnEnergyRequired * 2.0f / 3.0f;
+
+            Color offspringColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+            effectSpawner.SpawnReproductionEffect(tfm.position, offspringColor);
         }
     }
 
