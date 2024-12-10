@@ -62,9 +62,11 @@ public class Animal : MonoBehaviour
     void Start()
     {
         parameters = ParameterManager.Instance;
-        GameObject goalObj = new GameObject("Goal");
-        goal = goalObj.transform;
-        goal.SetParent(goalRoot);
+        if (goalRoot != null) {
+            GameObject goalObj = new GameObject("Goal");
+            goal = goalObj.transform;
+            goal.SetParent(goalRoot);
+        }
         // Network: 1 input per receptor, 1 output per actuator.
         visionInfo = new float[parameters.nEyes];
         geoInfo = new float[3];
@@ -219,15 +221,19 @@ public class Animal : MonoBehaviour
         speed = Mathf.Lerp(parameters.minSpeed, parameters.maxSpeed, output[2]);
         
         hiddenInfo[0] = output[3];
-
-        goalUpdateTimer += Time.deltaTime;
-        if (goalUpdateTimer >= parameters.goalUpdateRate) {
-            goalUpdateTimer = 0f;
-            
-            // Calculate new goal position
-            Vector3 targetDirection = speed * (Quaternion.Euler(0f, finalAngle, 0f) * hips.rotation * Vector3.forward);
-            
-            goal.position = tfm.position + targetDirection.normalized * parameters.maxGoalDistance;
+        
+        if (goal != null && hips != null) {
+            goalUpdateTimer += Time.deltaTime;
+            if (goalUpdateTimer >= parameters.goalUpdateRate) {
+                goalUpdateTimer = 0f;
+                
+                // Calculate new goal position
+                Vector3 targetDirection = speed * (Quaternion.Euler(0f, finalAngle, 0f) * hips.rotation * Vector3.forward);
+                
+                goal.position = tfm.position + targetDirection.normalized * parameters.maxGoalDistance;
+            }
+        } else {
+            tfm.rotation = Quaternion.Euler(0f, finalAngle, 0f) * tfm.rotation;
         }
     }
 

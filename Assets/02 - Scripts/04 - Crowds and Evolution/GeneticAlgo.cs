@@ -56,10 +56,12 @@ public class GeneticAlgo : MonoBehaviour
         GameObject animal = Instantiate(animalPrefab, transform);
         animal.SetActive(true);
         animal.GetComponent<Animal>().Setup(customTerrain, this);
-        animal.GetComponent<QuadrupedProceduralMotion>().Start();
-        if (animal.GetComponent<QuadrupedProceduralMotion>().targetRoot == null)
-        {
-            Debug.LogWarning($"TargetRoot is null for animal {animal.GetInstanceID()}. Check inspector assignment.");
+        if (animal.GetComponent<QuadrupedProceduralMotion>() != null) {
+            animal.GetComponent<QuadrupedProceduralMotion>().Start();
+            if (animal.GetComponent<QuadrupedProceduralMotion>().targetRoot == null)
+            {
+                Debug.LogWarning($"TargetRoot is null for animal {animal.GetInstanceID()}. Check inspector assignment.");
+            }
         }
 
         animal.transform.position = position;
